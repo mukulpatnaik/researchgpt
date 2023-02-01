@@ -1,0 +1,9 @@
+PyQt5
+PyPDF2
+pandas
+scikit-learn
+matplotlib
+scipy
+plotly
+openai
+pyinstaller
