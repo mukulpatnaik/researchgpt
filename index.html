@@ -1,6 +1,60 @@
-<script src="script.js"></script>
-<button id="upload-button">Upload PDF</button>
-<input type="file" id="pdf-input" style="display: none;" accept="application/pdf">
-<div id="pdf-container"></div>
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        background-color: black;
+        display: flex;
+        align-items: center;
+        height: 100vh;
+      }
+      .upload-btn {
+        background-color: white;
+        border: 2px solid black;
+        border-radius: 10px;
+        padding: 10px 20px;
+        cursor: pointer;
+        display: flex;
+      }
+      input[type="file"] {
+        display: none;
+      }
 
+      form {
+        margin: 0 auto;
+      }
+      
+      .pdf-viewer {
+        width: 100%;
+        height: 100%;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <form action="http://your-server-url/upload-pdf" method="post" enctype="multipart/form-data">
+      <label for="file-input" class="upload-btn">Upload PDF</label>
+      <input type="file" accept=".pdf" id="file-input"/>
+    </form>
+    <iframe id="pdf-viewer" class="pdf-viewer"></iframe>
+    <script>
+      const input = document.querySelector("input[type='file']");
+      const uploadBtn = document.querySelector(".upload-btn");
+      const viewer = document.querySelector("#pdf-viewer");
 
+      input.addEventListener("change", function() {
+        const file = this.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function() {
+          const url = reader.result;
+          viewer.src = url;
+          uploadBtn.style.display = "none";
+          viewer.style.display = "block";
+        };
+
+        reader.readAsDataURL(file);
+      });
+    </script>
+  </body>
+</html>

@@ -1,108 +1,23 @@
-from PyQt5.QtCore import QUrl, Qt
-from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTextEdit, QLineEdit, QPushButton, QFileDialog
-from PyQt5.QtWebEngineWidgets import QWebEngineSettings, QWebEngineView
+from flask import Flask, request
 from PyPDF2 import PdfReader
 import pandas as pd
 from openai.embeddings_utils import get_embedding, cosine_similarity
 import openai
 import os
 
-openai.api_key = os.environ['OPENAI_API_KEY']
+app = Flask(__name__)
 
+@app.route("/process-pdf", methods=['POST'])
+def process_pdf():
+    file = request.files['file']
+    pdf = PdfReader(file)
+    chatbot = Chatbot()
+    paper_text = chatbot.parse_paper(pdf)
+    global df
+    df = chatbot.paper_df(paper_text)
+    df = chatbot.calculate_embeddings(df)
+    return "PDF file processed and embeddings calculated"
 
-class MainWindow(QMainWindow):
-
-    def __init__(self):
-        super(MainWindow, self).__init__()
-        self.initUI()
-        title = "researchGPT"
- 
-        # set the title
-        self.setWindowTitle(title)
-
-    def initUI(self):
-        btn = QPushButton("Upload PDF", self)
-        btn.clicked.connect(self.uploadPDF)
-        btn.move(50, 50)
-        self.setAutoFillBackground(True)
-        p = self.palette()
-        p.setColor(self.backgroundRole(), Qt.black)
-        self.setPalette(p)
-
-    def uploadPDF(self):
-        label, width, height = self.displayPDF()
-        chat_widget = self.createChatUI(width, height)
-        self.mainLayout(label, chat_widget, width, height)
-
-    def displayPDF(self):
-        options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "", "PDF Files (*.pdf);;All Files (*)", options=options)
-        if file_name:
-
-            global pdf 
-            pdf = PdfReader(file_name)
-            # print(pdf.pages[0].extract_text())
-            global chatbot
-            chatbot = Chatbot()
-            global df
-            df = chatbot.calculate_embeddings(chatbot.paper_df(chatbot.parse_paper(pdf)))
-
-            webView = QWebEngineView()
-            webView.settings().setAttribute(QWebEngineSettings.PluginsEnabled, True)
-            webView.settings().setAttribute(QWebEngineSettings.PdfViewerEnabled, True)
-            webView.setUrl(QUrl(f"file://{file_name}"))
-            return webView, webView.width(), webView.height()
-
-    def createChatUI(self, width, height):
-        chat_layout = QVBoxLayout()
-        self.text_edit = QTextEdit()
-        chat_layout.addWidget(self.text_edit)
-        self.line_edit = QLineEdit()
-        chat_layout.addWidget(self.line_edit)
-        self.line_edit.setFixedHeight(50)
-
-        font = QFont()
-        font.setFamily('Roboto')
-        font.setPointSize(14)
-        self.line_edit.setFont(font)
-        self.text_edit.setFont(font)
-        self.text_edit.setStyleSheet(
-                """QLineEdit { 
-                background-color: black;
-                color: white;
-                font-size: 16px;
-                font-family: Roboto; }""")
-        
-        send_button = QPushButton("Send")
-        send_button.clicked.connect(self.sendMessage)
-        chat_layout.addWidget(send_button)
-
-        chat_widget = QWidget()
-        chat_widget.setLayout(chat_layout)
-        self.resize(width + 400, height)
-        return chat_widget
-
-    def sendMessage(self):
-        user_input = self.line_edit.text()
-        if user_input == "":
-            return None
-        prompt = chatbot.create_prompt(df, user_input)
-        response = chatbot.reply(prompt)
-        print(response)
-        self.text_edit.append(f"\nQuery: {user_input}\n")
-        self.text_edit.append(response+"\n")
-        self.line_edit.clear()
-
-
-    def mainLayout(self, label, chat_widget, width, height):
-        main_layout = QHBoxLayout()
-        main_layout.addWidget(label)
-        main_layout.addWidget(chat_widget)
-        main_widget = QWidget()
-        main_widget.setLayout(main_layout)
-        self.setCentralWidget(main_widget)
-        self.resize(width + 400, height+400)
 
 class Chatbot():
     
@@ -237,10 +152,5 @@ class Chatbot():
         prompt = self.create_prompt(df, prompt)
         return self.gpt(prompt)
 
-
 if __name__ == '__main__':
-        import sys
-        app = QApplication(sys.argv)
-        win = MainWindow()
-        win.show()
-        sys.exit(app.exec_())
+    app.run(debug=True)
