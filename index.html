@@ -1,58 +1,9 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <script src="js/script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.3.122/build/pdf.min.js"></script>
-    <style>
-      html {
-        height: 100%;
-        position: fixed;
-      }
-      
-      body {
-        margin: 0;
-        position: fixed;
-        background-color: black;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        height: 100%;
-        width: 100%;
-      }
-      .upload-btn {
-        color: white;
-        background-color: black;
-        border: 2px solid white;
-        border-radius: 10px;
-        padding: 10px 20px;
-        cursor: pointer;
-        display: flex;
-      }
-      input[type="file"] {
-        display: none;
-      }
-
-      form {
-        margin: auto 0;
-      }
-
-      input[type="text"] {
-        border: none;
-        outline: none;
-    }
-
-      #container {
-        display: none;
-        width: 100%;
-        height: 100vh;
-        flex-direction: row;
-      }
-
-      .pdf-viewer {
-        width: 100%;
-        height: 100vh;
-        display: none;
-      }
-    </style>
+    <link rel="stylesheet" href="css/styles.css">
   </head>
   <body>
     <form id='url' style="margin-top: 320px; margin-bottom: 20px; width: 100%; text-align: center;">
@@ -72,130 +23,12 @@
               <!-- Chat messages go here -->
             </div>
             <form style="display: flex; padding-left: 10px; margin-bottom: 10px; width: 100%;">
-              <input type="text" name='chat' style="flex-grow: 2; padding: 10px; border: none; background-color: black; color: white;" placeholder="Type a message..." />
+              <input type="text" name='chat' style="font-size: 14px; flex-grow: 2; padding: 10px; border: none; background-color: black; color: white;" placeholder="Type a message..." />
               <button id="send" style="background-color: transparent; border: none; padding: 10px 20px;">
                 <img src="send-icon.png" style="width: 20px; height: 20px;" />
               </button>
             </form>
         </div>          
     </div>
-    <script>
-        const input = document.querySelector("input[type='file']");
-        const uploadBtn = document.querySelector(".upload-btn");
-        const viewer = document.querySelector("#pdf-viewer");
-        const container = document.querySelector("#container");
-        const x = document.querySelector("input[name='pdf-url']");
-        const form = document.querySelector("form");
-        const p = document.querySelector("p");
-        const up = document.querySelector("#up");
-        const y = document.querySelector("#url");
-        const send = document.querySelector("#send");
-
-        send.addEventListener("click", function() {
-          event.preventDefault();
-          const message = document.querySelector("input[name='chat']").value;
-          // if the message is empty, do nothing
-          if (message === "") {
-            return;
-          }
-          // call the endpoint /reply with the message and get the reply.
-          fetch('http://127.0.0.1:5000/reply', {
-              method: 'POST',
-              body: JSON.stringify({'query': message}),
-              headers: {
-                  'Content-Type': 'application/json'
-              }
-          })
-          .then(response => response.json())
-          // Append the reply to #chat as a simple paragraph without any styling
-          .then(data => {
-              console.log(data.answer)
-              const chat = document.querySelector("#chat");
-              const reply = document.createElement("p");
-              reply.style.color = "white";
-              reply.style.margin = "10px";
-              reply.style.padding = "10px";
-              reply.style.borderRadius = "10px";
-              reply.style.backgroundColor = "grey";
-              reply.style.width = "fit-content";
-              reply.style.maxWidth = "80%";
-              reply.style.textAlign = "left";
-              reply.style.wordWrap = "break-word";
-              reply.style.font = "1.2em Roboto";
-              reply.innerHTML = data.answer;
-              chat.appendChild(reply);
-              chat.scrollTop = chat.scrollHeight;
-          });
-          document.querySelector("input[name='chat']").value = "";
-        });
-  
-        x.addEventListener("focus", function() {
-            if (this.value === "Enter URL") {
-            this.value = "";
-            this.style.color = "black";
-            }
-        });
-        
-        y.addEventListener("submit", function(event) {
-            event.preventDefault();
-
-            const url = this.elements["pdf-url"].value;
-            fetch('https://api.codetabs.com/v1/proxy?quest='+url)
-            .then(response => response.blob())
-            .then(pdfBlob => {
-                const pdfUrl = URL.createObjectURL(pdfBlob);
-                pdfjsLib.getDocument(pdfUrl).promise.then(pdfDoc => {
-                    viewer.src = pdfUrl;
-                    uploadBtn.style.display = "none";
-                    form.style.display = "none";
-                    form.style.marginTop = "0px";
-                    p.style.display = "none";
-                    up.style.display = "none";
-                    container.style.display = "flex";
-                    viewer.style.display = "block";
-                });
-                })
-                .catch(error => {
-                    console.error(error);
-                });
-            // Make a POST request to the server 'myserver/download-pdf' with the URL
-            fetch('http://127.0.0.1:5000/download_pdf', {
-                method: 'POST',
-                body: JSON.stringify({'url': url}),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-
-
-        });
-  
-        input.addEventListener("change", async function() {
-          const file = this.files[0];
-          const fileArrayBuffer = await file.arrayBuffer();
-          // Make a post request to "http://127.0.0.1:5000/process_pdf" with the file
-          fetch('http://127.0.0.1:5000/process_pdf', {
-              method: 'POST',
-              body: fileArrayBuffer,
-              headers: {
-                  'Content-Type': 'application/pdf',
-                  'Content-Length': fileArrayBuffer.byteLength
-              }
-          })
-          pdfjsLib.getDocument(fileArrayBuffer).promise.then(pdfDoc => {
-          viewer.src = URL.createObjectURL(file);
-          uploadBtn.style.display = "none";
-          form.style.display = "none";
-          form.style.marginTop = "0px";
-          p.style.display = "none";
-          up.style.display = "none";
-          container.style.display = "flex";
-          viewer.style.display = "block";
-          }).catch(error => {
-          console.error(error);
-          });
-        });
-
-  </script>
   </body>
 </html>

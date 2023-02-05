@@ -105,7 +105,7 @@ class Chatbot():
         sources = []
         for i in range(n):
             # append the page number and the text as a dict to the sources list
-            sources.append({'page: '+str(results.iloc[i]['page']): results.iloc[i]['text'][:100]+'...'})
+            sources.append({'Page '+str(results.iloc[i]['page']): results.iloc[i]['text'][:150]+'...'})
         print(sources)
         return results.head(n)
     
@@ -133,9 +133,10 @@ class Chatbot():
         print('Sending request to GPT-3')
         openai.api_key = os.getenv('OPENAI_API_KEY')
         r = openai.Completion.create(model="text-davinci-003", prompt=prompt, temperature=0.4, max_tokens=1500)
-        response = r.choices[0]['text']
+        answer = r.choices[0]['text']
         print('Done sending request to GPT-3')
-        return response.strip("\n")+"\n\nsources: """+str(sources)
+        response = {'answer': answer, 'sources': sources}
+        return response
 
     def reply(self, prompt):
         print(prompt)
@@ -179,8 +180,7 @@ def reply():
     query = request.json['query']
     query = str(query)
     prompt = chatbot.create_prompt(df, query)
-    answer = chatbot.gpt(prompt)
-    response = json.dumps({'answer': answer})
+    response = chatbot.gpt(prompt)
     print(response)
     return response, 200
 

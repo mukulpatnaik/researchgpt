@@ -1,0 +1,69 @@
+html {
+    height: 100%;
+    position: fixed;
+  }
+  
+body {
+    margin: 0;
+    position: fixed;
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+.upload-btn {
+    color: white;
+    background-color: black;
+    border: 2px solid white;
+    border-radius: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    display: flex;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+form {
+    margin: auto 0;
+}
+
+input[type="text"] {
+    border: none;
+    outline: none;
+}
+
+#container {
+    display: none;
+    width: 100%;
+    height: 100vh;
+    flex-direction: row;
+}
+
+.pdf-viewer {
+    width: 100%;
+    height: 100vh;
+    display: none;
+}
+
+#chat {
+    width: 100%;
+}
+
+#chat p {
+    color: white;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    width: fit-content;
+    text-align: left;
+    word-break: break-all;
+    font-family: Roboto;
+    font-size: 18px;
+    font-weight: lighter;
+  }
+  
