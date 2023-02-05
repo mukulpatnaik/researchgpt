@@ -1,22 +1,16 @@
 from flask import Flask, request
+from io import BytesIO
 from PyPDF2 import PdfReader
 import pandas as pd
 from openai.embeddings_utils import get_embedding, cosine_similarity
 import openai
 import os
+import requests
+from flask_cors import CORS
+import json
 
 app = Flask(__name__)
-
-@app.route("/process-pdf", methods=['POST'])
-def process_pdf():
-    file = request.files['file']
-    pdf = PdfReader(file)
-    chatbot = Chatbot()
-    paper_text = chatbot.parse_paper(pdf)
-    global df
-    df = chatbot.paper_df(paper_text)
-    df = chatbot.calculate_embeddings(df)
-    return "PDF file processed and embeddings calculated"
+CORS(app)
 
 
 class Chatbot():
@@ -60,9 +54,7 @@ class Chatbot():
                         blob_font_size = None
                         blob_text = ''
                 else:
-                    print('bear')
                     if blob_font_size is not None and len(blob_text) >= 1:
-                        print("bird")
                         processed_text.append({
                             'fontsize': blob_font_size,
                             'text': blob_text,
@@ -72,7 +64,7 @@ class Chatbot():
                     blob_text = t['text']
                 paper_text += processed_text
         print("Done parsing paper")
-        print(paper_text)
+        # print(paper_text)
         return paper_text
 
     def paper_df(self, pdf):
@@ -83,11 +75,10 @@ class Chatbot():
                 continue
             filtered_pdf.append(row)
         df = pd.DataFrame(filtered_pdf)
-        print(df.head())
-        df['length'] = df['text'].apply(lambda x: len(x))
         # print(df.shape)
         # remove elements with identical df[text] and df[page] values
         df = df.drop_duplicates(subset=['text', 'page'], keep='first')
+        df['length'] = df['text'].apply(lambda x: len(x))
         print('Done creating dataframe')
         return df
 
@@ -106,7 +97,7 @@ class Chatbot():
             engine="text-embedding-ada-002"
         )
         df["similarity"] = df.embeddings.apply(lambda x: cosine_similarity(x, query_embedding))
-
+        
         results = df.sort_values("similarity", ascending=False, ignore_index=True)
         # make a dictionary of the the first three results with the page number as the key and the text as the value. The page number is a column in the dataframe.
         results = results.head(n)
@@ -146,11 +137,52 @@ class Chatbot():
         print('Done sending request to GPT-3')
         return response.strip("\n")+"\n\nsources: """+str(sources)
 
-
     def reply(self, prompt):
         print(prompt)
         prompt = self.create_prompt(df, prompt)
         return self.gpt(prompt)
+
+@app.route("/", methods=["GET", "POST"])
+def index():
+    return "Welcome to my chatbot server"
+
+@app.route("/process_pdf", methods=['POST'])
+def process_pdf():
+    print("Processing pdf")
+    file = request.data
+    pdf = PdfReader(BytesIO(file))
+    chatbot = Chatbot()
+    paper_text = chatbot.parse_paper(pdf)
+    global df
+    df = chatbot.paper_df(paper_text)
+    df = chatbot.calculate_embeddings(df)
+    print("Done processing pdf")
+    return "PDF file processed and embeddings calculated"
+
+@app.route("/download_pdf", methods=['POST'])
+def download_pdf():
+    chatbot = Chatbot()
+    url = request.json['url']
+    r = requests.get(str(url))
+    print(r.headers)
+    pdf = PdfReader(BytesIO(r.content))
+    paper_text = chatbot.parse_paper(pdf)
+    global df
+    df = chatbot.paper_df(paper_text)
+    df = chatbot.calculate_embeddings(df)
+    print("Done processing pdf")
+    return "PDF file processed and embeddings calculated"
+
+@app.route("/reply", methods=['POST'])
+def reply():
+    chatbot = Chatbot()
+    query = request.json['query']
+    query = str(query)
+    prompt = chatbot.create_prompt(df, query)
+    answer = chatbot.gpt(prompt)
+    response = json.dumps({'answer': answer})
+    print(response)
+    return response, 200
 
 if __name__ == '__main__':
     app.run(debug=True)
