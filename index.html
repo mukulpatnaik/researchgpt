@@ -1,16 +1,26 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.3.122/build/pdf.min.js"></script>
     <style>
+      html {
+        height: 100%;
+        position: fixed;
+      }
+      
       body {
+        margin: 0;
+        position: fixed;
         background-color: black;
         display: flex;
         align-items: center;
-        height: 100vh;
+        height: 100%;
+        width: 100%;
       }
       .upload-btn {
-        background-color: white;
-        border: 2px solid black;
+        color: white;
+        background-color: black;
+        border: 2px solid white;
         border-radius: 10px;
         padding: 10px 20px;
         cursor: pointer;
@@ -23,10 +33,17 @@
       form {
         margin: 0 auto;
       }
-      
+
+      #container {
+        display: none;
+        width: 100%;
+        height: 100vh;
+        flex-direction: row;
+      }
+
       .pdf-viewer {
         width: 100%;
-        height: 100%;
+        height: 100vh;
         display: none;
       }
     </style>
@@ -36,25 +53,38 @@
       <label for="file-input" class="upload-btn">Upload PDF</label>
       <input type="file" accept=".pdf" id="file-input"/>
     </form>
-    <iframe id="pdf-viewer" class="pdf-viewer"></iframe>
+    <div id="container">
+        <iframe id="pdf-viewer" class="pdf-viewer" style="border-width: 0"></iframe> 
+        <div style="width: 40%; height: 100vh; border: none; background-color: black; display: flex; flex-direction: column;">
+            <div style="height: 80%; overflow-y: scroll; background-color: black;">
+              <!-- Chat messages go here -->
+            </div>
+            <form style="display: flex; padding-top: 30px; padding-left: 10px; margin: auto; width: 90%;">
+              <input type="text" style="flex-grow: 2; padding: 10px; border: none; background-color: black; color: white;" placeholder="Type a message..." />
+              <button style="background-color: transparent; border: none; padding: 10px 20px;">
+                <img src="send-icon.png" style="width: 20px; height: 20px;" />
+              </button>
+            </form>
+        </div>          
+    </div>
     <script>
-      const input = document.querySelector("input[type='file']");
-      const uploadBtn = document.querySelector(".upload-btn");
-      const viewer = document.querySelector("#pdf-viewer");
-
-      input.addEventListener("change", function() {
-        const file = this.files[0];
-        const reader = new FileReader();
-
-        reader.onload = function() {
-          const url = reader.result;
-          viewer.src = url;
+        const input = document.querySelector("input[type='file']");
+        const uploadBtn = document.querySelector(".upload-btn");
+        const viewer = document.querySelector("#pdf-viewer");
+        const container = document.querySelector("#container");
+  
+        input.addEventListener("change", async function() {
+          const file = this.files[0];
+          const fileArrayBuffer = await file.arrayBuffer();
+          pdfjsLib.getDocument(fileArrayBuffer).promise.then(pdfDoc => {
+          viewer.src = URL.createObjectURL(file);
           uploadBtn.style.display = "none";
+          container.style.display = "flex";
           viewer.style.display = "block";
-        };
-
-        reader.readAsDataURL(file);
-      });
-    </script>
+          }).catch(error => {
+          console.error(error);
+          });
+        });
+  </script>
   </body>
 </html>
