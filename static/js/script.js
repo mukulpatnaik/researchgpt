@@ -26,7 +26,7 @@ send.addEventListener("click", function(event) {
   chat.appendChild(query);
 
   // call the endpoint /reply with the message and get the reply.
-  fetch('http://127.0.0.1:5000/reply', {
+  fetch('/reply', {
       method: 'POST',
       body: JSON.stringify({'query': message}),
       headers: {
@@ -101,13 +101,16 @@ y.addEventListener("submit", function(event) {
             console.error(error);
         });
     // Make a POST request to the server 'myserver/download-pdf' with the URL
-    fetch('http://127.0.0.1:5000/download_pdf', {
-        method: 'POST',
-        body: JSON.stringify({'url': url}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
+    fetch('/download_pdf', {
+      method: 'POST',
+      body: JSON.stringify({'url': url}),
+      headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      }
+  })  
 
 });
 
@@ -116,12 +119,15 @@ input.addEventListener("change", async function() {
   const fileArrayBuffer = await file.arrayBuffer();
   console.log(fileArrayBuffer);
   // Make a post request to "http://127.0.0.1:5000/process_pdf" with the file
-  fetch('http://127.0.0.1:5000/process_pdf', {
+  fetch('/process_pdf', {
       method: 'POST',
       body: fileArrayBuffer,
       headers: {
           'Content-Type': 'application/pdf',
-          'Content-Length': fileArrayBuffer.byteLength
+          'Content-Length': fileArrayBuffer.byteLength,
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
       }
   })
   pdfjsLib.getDocument(fileArrayBuffer).promise.then(pdfDoc => {

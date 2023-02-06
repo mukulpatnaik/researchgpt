@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 from io import BytesIO
 from PyPDF2 import PdfReader
 import pandas as pd
@@ -145,7 +145,7 @@ class Chatbot():
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    return "Welcome to my chatbot server"
+    return render_template("index.html")
 
 @app.route("/process_pdf", methods=['POST'])
 def process_pdf():
@@ -185,4 +185,4 @@ def reply():
     return response, 200
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8888, debug=True)
