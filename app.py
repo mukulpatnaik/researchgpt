@@ -155,6 +155,7 @@ def process_pdf():
     paper_text = chatbot.parse_paper(pdf)
     df = chatbot.paper_df(paper_text)
     df = chatbot.calculate_embeddings(df)
+    print(df.head(5))
     # save dataframe to csv at static/df.csv
     df.to_csv('static/df.csv')
     print("Done processing pdf")
@@ -170,6 +171,7 @@ def download_pdf():
     paper_text = chatbot.parse_paper(pdf)
     df = chatbot.paper_df(paper_text)
     df = chatbot.calculate_embeddings(df)
+    print(df.head(5))
     df.to_csv('static/df.csv')
     print("Done processing pdf")
     return "PDF file processed and embeddings calculated"
@@ -180,6 +182,7 @@ def reply():
     query = request.json['query']
     query = str(query)
     df = pd.read_csv('static/df.csv')
+    print(df.head(5))
     prompt = chatbot.create_prompt(df, query)
     response = chatbot.gpt(prompt)
     print(response)
