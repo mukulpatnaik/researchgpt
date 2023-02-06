@@ -1,108 +1,16 @@
-from PyQt5.QtCore import QUrl, Qt
-from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTextEdit, QLineEdit, QPushButton, QFileDialog
-from PyQt5.QtWebEngineWidgets import QWebEngineSettings, QWebEngineView
+from flask import Flask, request, render_template
+from io import BytesIO
 from PyPDF2 import PdfReader
 import pandas as pd
 from openai.embeddings_utils import get_embedding, cosine_similarity
 import openai
 import os
+import requests
+from flask_cors import CORS
 
-openai.api_key = os.environ['OPENAI_API_KEY']
+app = Flask(__name__)
+CORS(app)
 
-
-class MainWindow(QMainWindow):
-
-    def __init__(self):
-        super(MainWindow, self).__init__()
-        self.initUI()
-        title = "researchGPT"
- 
-        # set the title
-        self.setWindowTitle(title)
-
-    def initUI(self):
-        btn = QPushButton("Upload PDF", self)
-        btn.clicked.connect(self.uploadPDF)
-        btn.move(50, 50)
-        self.setAutoFillBackground(True)
-        p = self.palette()
-        p.setColor(self.backgroundRole(), Qt.black)
-        self.setPalette(p)
-
-    def uploadPDF(self):
-        label, width, height = self.displayPDF()
-        chat_widget = self.createChatUI(width, height)
-        self.mainLayout(label, chat_widget, width, height)
-
-    def displayPDF(self):
-        options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "", "PDF Files (*.pdf);;All Files (*)", options=options)
-        if file_name:
-
-            global pdf 
-            pdf = PdfReader(file_name)
-            # print(pdf.pages[0].extract_text())
-            global chatbot
-            chatbot = Chatbot()
-            global df
-            df = chatbot.calculate_embeddings(chatbot.paper_df(chatbot.parse_paper(pdf)))
-
-            webView = QWebEngineView()
-            webView.settings().setAttribute(QWebEngineSettings.PluginsEnabled, True)
-            webView.settings().setAttribute(QWebEngineSettings.PdfViewerEnabled, True)
-            webView.setUrl(QUrl(f"file://{file_name}"))
-            return webView, webView.width(), webView.height()
-
-    def createChatUI(self, width, height):
-        chat_layout = QVBoxLayout()
-        self.text_edit = QTextEdit()
-        chat_layout.addWidget(self.text_edit)
-        self.line_edit = QLineEdit()
-        chat_layout.addWidget(self.line_edit)
-        self.line_edit.setFixedHeight(50)
-
-        font = QFont()
-        font.setFamily('Roboto')
-        font.setPointSize(14)
-        self.line_edit.setFont(font)
-        self.text_edit.setFont(font)
-        self.text_edit.setStyleSheet(
-                """QLineEdit { 
-                background-color: black;
-                color: white;
-                font-size: 16px;
-                font-family: Roboto; }""")
-        
-        send_button = QPushButton("Send")
-        send_button.clicked.connect(self.sendMessage)
-        chat_layout.addWidget(send_button)
-
-        chat_widget = QWidget()
-        chat_widget.setLayout(chat_layout)
-        self.resize(width + 400, height)
-        return chat_widget
-
-    def sendMessage(self):
-        user_input = self.line_edit.text()
-        if user_input == "":
-            return None
-        prompt = chatbot.create_prompt(df, user_input)
-        response = chatbot.reply(prompt)
-        print(response)
-        self.text_edit.append(f"\nQuery: {user_input}\n")
-        self.text_edit.append(response+"\n")
-        self.line_edit.clear()
-
-
-    def mainLayout(self, label, chat_widget, width, height):
-        main_layout = QHBoxLayout()
-        main_layout.addWidget(label)
-        main_layout.addWidget(chat_widget)
-        main_widget = QWidget()
-        main_widget.setLayout(main_layout)
-        self.setCentralWidget(main_widget)
-        self.resize(width + 400, height+400)
 
 class Chatbot():
     
@@ -145,9 +53,7 @@ class Chatbot():
                         blob_font_size = None
                         blob_text = ''
                 else:
-                    print('bear')
                     if blob_font_size is not None and len(blob_text) >= 1:
-                        print("bird")
                         processed_text.append({
                             'fontsize': blob_font_size,
                             'text': blob_text,
@@ -157,7 +63,7 @@ class Chatbot():
                     blob_text = t['text']
                 paper_text += processed_text
         print("Done parsing paper")
-        print(paper_text)
+        # print(paper_text)
         return paper_text
 
     def paper_df(self, pdf):
@@ -168,11 +74,10 @@ class Chatbot():
                 continue
             filtered_pdf.append(row)
         df = pd.DataFrame(filtered_pdf)
-        print(df.head())
-        df['length'] = df['text'].apply(lambda x: len(x))
         # print(df.shape)
         # remove elements with identical df[text] and df[page] values
         df = df.drop_duplicates(subset=['text', 'page'], keep='first')
+        df['length'] = df['text'].apply(lambda x: len(x))
         print('Done creating dataframe')
         return df
 
@@ -191,7 +96,7 @@ class Chatbot():
             engine="text-embedding-ada-002"
         )
         df["similarity"] = df.embeddings.apply(lambda x: cosine_similarity(x, query_embedding))
-
+        
         results = df.sort_values("similarity", ascending=False, ignore_index=True)
         # make a dictionary of the the first three results with the page number as the key and the text as the value. The page number is a column in the dataframe.
         results = results.head(n)
@@ -199,7 +104,7 @@ class Chatbot():
         sources = []
         for i in range(n):
             # append the page number and the text as a dict to the sources list
-            sources.append({'page: '+str(results.iloc[i]['page']): results.iloc[i]['text'][:100]+'...'})
+            sources.append({'Page '+str(results.iloc[i]['page']): results.iloc[i]['text'][:150]+'...'})
         print(sources)
         return results.head(n)
     
@@ -227,20 +132,56 @@ class Chatbot():
         print('Sending request to GPT-3')
         openai.api_key = os.getenv('OPENAI_API_KEY')
         r = openai.Completion.create(model="text-davinci-003", prompt=prompt, temperature=0.4, max_tokens=1500)
-        response = r.choices[0]['text']
+        answer = r.choices[0]['text']
         print('Done sending request to GPT-3')
-        return response.strip("\n")+"\n\nsources: """+str(sources)
-
+        response = {'answer': answer, 'sources': sources}
+        return response
 
     def reply(self, prompt):
         print(prompt)
         prompt = self.create_prompt(df, prompt)
         return self.gpt(prompt)
 
+@app.route("/", methods=["GET", "POST"])
+def index():
+    return render_template("index.html")
+
+@app.route("/process_pdf", methods=['POST'])
+def process_pdf():
+    print("Processing pdf")
+    file = request.data
+    pdf = PdfReader(BytesIO(file))
+    chatbot = Chatbot()
+    paper_text = chatbot.parse_paper(pdf)
+    global df
+    df = chatbot.paper_df(paper_text)
+    df = chatbot.calculate_embeddings(df)
+    print("Done processing pdf")
+    return "PDF file processed and embeddings calculated"
+
+@app.route("/download_pdf", methods=['POST'])
+def download_pdf():
+    chatbot = Chatbot()
+    url = request.json['url']
+    r = requests.get(str(url))
+    print(r.headers)
+    pdf = PdfReader(BytesIO(r.content))
+    paper_text = chatbot.parse_paper(pdf)
+    global df
+    df = chatbot.paper_df(paper_text)
+    df = chatbot.calculate_embeddings(df)
+    print("Done processing pdf")
+    return "PDF file processed and embeddings calculated"
+
+@app.route("/reply", methods=['POST'])
+def reply():
+    chatbot = Chatbot()
+    query = request.json['query']
+    query = str(query)
+    prompt = chatbot.create_prompt(df, query)
+    response = chatbot.gpt(prompt)
+    print(response)
+    return response, 200
 
 if __name__ == '__main__':
-        import sys
-        app = QApplication(sys.argv)
-        win = MainWindow()
-        win.show()
-        sys.exit(app.exec_())
+    app.run(host='127.0.0.1', port=8080, debug=True)
