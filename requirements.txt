@@ -7,5 +7,5 @@ flask-cors
 matplotlib
 scipy
 plotly
-scikit-learn
+scikit-learn==0.24.1
 gunicon
