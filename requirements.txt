@@ -8,4 +8,3 @@ matplotlib
 scipy
 plotly
 scikit-learn==0.24.1
-gunicon
