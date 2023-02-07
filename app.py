@@ -9,6 +9,7 @@ import requests
 from flask_cors import CORS
 import redis
 from _md5 import md5
+# from google.cloud import storage
 
 app = Flask(__name__)
 db=redis.from_url(os.environ['REDISCLOUD_URL'])
@@ -150,9 +151,6 @@ def process_pdf():
     print("Processing pdf")
     key = md5(request.data).hexdigest()
     print(key)
-    x = pd.DataFrame(columns=['keys'])
-    x = x.append({'keys': key}, ignore_index=True)
-    x.to_csv('static/keys.csv', mode='a', index=False, header=False)
     file = request.data
     pdf = PdfReader(BytesIO(file))
     chatbot = Chatbot()
@@ -164,7 +162,7 @@ def process_pdf():
     # print(db.set(key, df.to_json()))
     # print(db.get(key))
     print("Done processing pdf")
-    return "PDF file processed and embeddings calculated"
+    return {"key": key}
 
 @app.route("/download_pdf", methods=['POST'])
 def download_pdf():
@@ -172,9 +170,6 @@ def download_pdf():
     url = request.json['url']
     r = requests.get(str(url))
     key = md5(r.content).hexdigest()
-    x = pd.DataFrame(columns=['keys'])
-    x = x.append({'keys': key}, ignore_index=True)
-    x.to_csv('static/keys.csv', mode='a', index=False, header=False)
     pdf = PdfReader(BytesIO(r.content))
     paper_text = chatbot.parse_paper(pdf)
     df = chatbot.paper_df(paper_text)
@@ -182,17 +177,14 @@ def download_pdf():
     if db.get(key) is None:
         db.set(key, df.to_json())
     print("Done processing pdf")
-    return "PDF file processed and embeddings calculated"
+    return {"key": key}
 
 @app.route("/reply", methods=['POST'])
 def reply():
     chatbot = Chatbot()
+    key = request.json['key']
     query = request.json['query']
     query = str(query)
-    x = pd.read_csv('static/keys.csv')
-    key = x['keys'].iloc[-1]
-    print(key)
-    # print(db.get(key))
     df = pd.read_json(BytesIO(db.get(key)))
     print(df.head(5))
     prompt = chatbot.create_prompt(df, query)

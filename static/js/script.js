@@ -28,7 +28,7 @@ send.addEventListener("click", function(event) {
   // call the endpoint /reply with the message and get the reply.
   fetch('/reply', {
       method: 'POST',
-      body: JSON.stringify({'query': message}),
+      body: JSON.stringify({'query': message, 'key': window.key}),
       headers: {
           'Content-Type': 'application/json'
       }
@@ -110,7 +110,12 @@ y.addEventListener("submit", function(event) {
           'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type, Authorization'
       }
-  })  
+  })
+  .then(response => response.json())
+  // Append the reply to #chat as a simple paragraph without any styling
+  .then(data => {
+    window.key = data.key;
+  });
 
 });
 
@@ -130,6 +135,11 @@ input.addEventListener("change", async function() {
           'Access-Control-Allow-Headers': 'Content-Type, Authorization'
       }
   })
+  .then(response => response.json())
+  // Append the reply to #chat as a simple paragraph without any styling
+  .then(data => {
+    window.key = data.key;
+  });
   pdfjsLib.getDocument(fileArrayBuffer).promise.then(pdfDoc => {
   viewer.src = URL.createObjectURL(file);
   uploadBtn.style.display = "none";
