@@ -198,7 +198,7 @@ def reply():
     prompt = chatbot.create_prompt(df, query)
     response = chatbot.gpt(prompt)
     print(response)
-    return {'answer': 'ok', 'sources': ''}, 200
+    return response, 200
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)
