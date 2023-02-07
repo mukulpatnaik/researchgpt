@@ -70,9 +70,19 @@ send.addEventListener("click", function(event) {
           chat.appendChild(p);
         }
       });
-
-
-  });
+    })
+    .catch(error => {
+      chat.removeChild(loading);
+      console.error(error);
+    
+      const errorMessage = document.createElement("p");
+      errorMessage.style.color = "red";
+      errorMessage.style.marginBottom = "0px";
+      errorMessage.style.paddingTop = "0px";
+      errorMessage.innerHTML = "Error: Request to OpenAI failed. Please try again.";
+      chat.appendChild(errorMessage);
+      chat.scrollTop = chat.scrollHeight;
+    });
   document.querySelector("input[name='chat']").value = "";
 });
 
