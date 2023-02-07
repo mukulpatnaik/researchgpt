@@ -160,8 +160,10 @@ def process_pdf():
     df = chatbot.paper_df(paper_text)
     df = chatbot.calculate_embeddings(df)
     print(df.head(5))
+    print(db.get(key))
     if db.get(key) is None:
         db.set(key, df.to_json())
+    print(db.set(key, df.to_json()))
     print("Done processing pdf")
     return "PDF file processed and embeddings calculated"
 
@@ -179,6 +181,7 @@ def download_pdf():
     df = chatbot.paper_df(paper_text)
     df = chatbot.calculate_embeddings(df)
     print(df.head(5))
+    print(db.get(key))
     if db.get(key) is None:
         db.set(key, df.to_json())
     print("Done processing pdf")
