@@ -5,7 +5,7 @@ const input = document.querySelector("input[type='file']");
 const uploadBtn = document.querySelector(".upload-btn");
 const viewer = document.querySelector("#pdf-viewer");
 const container = document.querySelector("#container");
-const x = document.querySelector("input[name='pdf-url']");
+var x = document.querySelector("input[name='pdf-url']");
 const form = document.querySelector("form");
 const p = document.querySelector("p");
 const up = document.querySelector("#up");
@@ -24,6 +24,12 @@ send.addEventListener("click", function(event) {
   const query = document.createElement("p");
   query.innerHTML = message;
   chat.appendChild(query);
+  
+  const loading = document.createElement("p");
+  loading.style.color = "lightgray";
+  loading.style.fontSize = "14px";
+  loading.innerHTML = "Loading...";
+  chat.appendChild(loading);
 
   // call the endpoint /reply with the message and get the reply.
   fetch('/reply', {
@@ -36,7 +42,8 @@ send.addEventListener("click", function(event) {
   .then(response => response.json())
   // Append the reply to #chat as a simple paragraph without any styling
   .then(data => {
-      console.log(data.answer)
+      console.log(data.answer);
+      chat.removeChild(loading);
 
       const reply = document.createElement("p");
       reply.style.color = "lightgray";
@@ -78,8 +85,8 @@ x.addEventListener("focus", function() {
 
 y.addEventListener("submit", function(event) {
     event.preventDefault();
-
     const url = this.elements["pdf-url"].value;
+    x.value = "Loading...";
     console.log(url);
     fetch('https://api.codetabs.com/v1/proxy?quest='+url)
     .then(response => response.blob())
@@ -100,6 +107,12 @@ y.addEventListener("submit", function(event) {
         .catch(error => {
             console.error(error);
         });
+    var loading = document.createElement("p");
+    loading.style.color = "lightgray";
+    loading.style.fontSize = "14px";
+    loading.innerHTML = "Calculating embeddings...";
+    chat.appendChild(loading);
+
     // Make a POST request to the server 'myserver/download-pdf' with the URL
     fetch('/download_pdf', {
       method: 'POST',
@@ -114,6 +127,7 @@ y.addEventListener("submit", function(event) {
   .then(response => response.json())
   // Append the reply to #chat as a simple paragraph without any styling
   .then(data => {
+    chat.removeChild(loading);
     window.key = data.key;
   });
 
@@ -123,6 +137,13 @@ input.addEventListener("change", async function() {
   const file = this.files[0];
   const fileArrayBuffer = await file.arrayBuffer();
   console.log(fileArrayBuffer);
+
+  var loading = document.createElement("p");
+  loading.style.color = "lightgray";
+  loading.style.fontSize = "14px";
+  loading.innerHTML = "Calculating embeddings...";
+  chat.appendChild(loading);
+
   // Make a post request to /process_pdf with the file
   fetch('/process_pdf', {
       method: 'POST',
@@ -138,6 +159,7 @@ input.addEventListener("change", async function() {
   .then(response => response.json())
   // Append the reply to #chat as a simple paragraph without any styling
   .then(data => {
+    chat.removeChild(loading);
     window.key = data.key;
   });
   pdfjsLib.getDocument(fileArrayBuffer).promise.then(pdfDoc => {
