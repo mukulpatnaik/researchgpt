@@ -11,8 +11,8 @@ import redis
 from _md5 import md5
 
 app = Flask(__name__)
-db=redis.from_url(os.environ['REDISCLOUD_URL'])
-# db = redis.StrictRedis(host='localhost', port=6379, db=0)
+# db=redis.from_url(os.environ['REDISCLOUD_URL'])
+db = redis.StrictRedis(host='localhost', port=6379, db=0)
 CORS(app)
 
 
@@ -159,11 +159,10 @@ def process_pdf():
     paper_text = chatbot.parse_paper(pdf)
     df = chatbot.paper_df(paper_text)
     df = chatbot.calculate_embeddings(df)
-    print(df.head(5))
-    print(db.get(key))
     if db.get(key) is None:
         db.set(key, df.to_json())
-    print(db.set(key, df.to_json()))
+    # print(db.set(key, df.to_json()))
+    # print(db.get(key))
     print("Done processing pdf")
     return "PDF file processed and embeddings calculated"
 
@@ -180,8 +179,6 @@ def download_pdf():
     paper_text = chatbot.parse_paper(pdf)
     df = chatbot.paper_df(paper_text)
     df = chatbot.calculate_embeddings(df)
-    print(df.head(5))
-    print(db.get(key))
     if db.get(key) is None:
         db.set(key, df.to_json())
     print("Done processing pdf")
@@ -195,13 +192,13 @@ def reply():
     x = pd.read_csv('static/keys.csv')
     key = x['keys'].iloc[-1]
     print(key)
-    print(db.get(key))
+    # print(db.get(key))
     df = pd.read_json(BytesIO(db.get(key)))
     print(df.head(5))
     prompt = chatbot.create_prompt(df, query)
     response = chatbot.gpt(prompt)
     print(response)
-    return response, 200
+    return {'answer': 'ok', 'sources': ''}, 200
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)
