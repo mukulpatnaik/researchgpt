@@ -7,8 +7,12 @@ import openai
 import os
 import requests
 from flask_cors import CORS
+import redis
+from _md5 import md5
 
 app = Flask(__name__)
+db=redis.from_url(os.environ['REDISCLOUD_URL'])
+# db = redis.StrictRedis(host='localhost', port=6379, db=0)
 CORS(app)
 
 
@@ -137,11 +141,6 @@ class Chatbot():
         response = {'answer': answer, 'sources': sources}
         return response
 
-    def reply(self, prompt):
-        print(prompt)
-        prompt = self.create_prompt(df, prompt)
-        return self.gpt(prompt)
-
 @app.route("/", methods=["GET", "POST"])
 def index():
     return render_template("index.html")
@@ -149,6 +148,11 @@ def index():
 @app.route("/process_pdf", methods=['POST'])
 def process_pdf():
     print("Processing pdf")
+    key = md5(request.data).hexdigest()
+    print(key)
+    x = pd.DataFrame(columns=['keys'])
+    x = x.append({'keys': key}, ignore_index=True)
+    x.to_csv('static/keys.csv', mode='a', index=False, header=False)
     file = request.data
     pdf = PdfReader(BytesIO(file))
     chatbot = Chatbot()
@@ -156,8 +160,8 @@ def process_pdf():
     df = chatbot.paper_df(paper_text)
     df = chatbot.calculate_embeddings(df)
     print(df.head(5))
-    # save dataframe to csv at static/df.csv
-    df.to_csv('static/df.csv')
+    if db.get(key) is None:
+        db.set(key, df.to_json())
     print("Done processing pdf")
     return "PDF file processed and embeddings calculated"
 
@@ -166,13 +170,17 @@ def download_pdf():
     chatbot = Chatbot()
     url = request.json['url']
     r = requests.get(str(url))
-    print(r.headers)
+    key = md5(r.content).hexdigest()
+    x = pd.DataFrame(columns=['keys'])
+    x = x.append({'keys': key}, ignore_index=True)
+    x.to_csv('static/keys.csv', mode='a', index=False, header=False)
     pdf = PdfReader(BytesIO(r.content))
     paper_text = chatbot.parse_paper(pdf)
     df = chatbot.paper_df(paper_text)
     df = chatbot.calculate_embeddings(df)
     print(df.head(5))
-    df.to_csv('static/df.csv')
+    if db.get(key) is None:
+        db.set(key, df.to_json())
     print("Done processing pdf")
     return "PDF file processed and embeddings calculated"
 
@@ -181,7 +189,11 @@ def reply():
     chatbot = Chatbot()
     query = request.json['query']
     query = str(query)
-    df = pd.read_csv('static/df.csv')
+    x = pd.read_csv('static/keys.csv')
+    key = x['keys'].iloc[-1]
+    print(key)
+    print(db.get(key))
+    df = pd.read_json(BytesIO(db.get(key)))
     print(df.head(5))
     prompt = chatbot.create_prompt(df, query)
     response = chatbot.gpt(prompt)

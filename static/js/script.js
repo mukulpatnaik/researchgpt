@@ -118,7 +118,7 @@ input.addEventListener("change", async function() {
   const file = this.files[0];
   const fileArrayBuffer = await file.arrayBuffer();
   console.log(fileArrayBuffer);
-  // Make a post request to "http://127.0.0.1:5000/process_pdf" with the file
+  // Make a post request to /process_pdf with the file
   fetch('/process_pdf', {
       method: 'POST',
       body: fileArrayBuffer,
