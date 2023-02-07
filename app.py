@@ -11,8 +11,8 @@ import redis
 from _md5 import md5
 
 app = Flask(__name__)
-# db=redis.from_url(os.environ['REDISCLOUD_URL'])
-db = redis.StrictRedis(host='localhost', port=6379, db=0)
+db=redis.from_url(os.environ['REDISCLOUD_URL'])
+# db = redis.StrictRedis(host='localhost', port=6379, db=0)
 CORS(app)
 
 
