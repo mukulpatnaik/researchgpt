@@ -1,0 +1,58 @@
+# Copyright 2021 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+runtime: python310
+
+instance_class: F4_1G
+
+inbound_services:
+- warmup
+
+handlers:
+  # This configures Google App Engine to serve the files in the app's static
+  # directory.
+- url: /static
+  static_dir: static
+
+- url: /_ah/warmup
+  script: main.py
+
+- url: /process_pdf
+  script: main.py
+  secure: always
+
+- url: /download_pdf
+  script: main.py
+  secure: always
+
+- url: /reply
+  script: main.py
+  secure: always
+
+  # This handler routes all requests not caught above to your main app. It is
+  # required when static routes are defined, but can be omitted (along with
+  # the entire handlers section) when there are no static files defined.
+- url: /.*
+  script: auto
+
+automatic_scaling:
+  min_idle_instances: automatic
+  max_idle_instances: 1
+  min_pending_latency: 30ms
+  max_pending_latency: 1s
+  max_concurrent_requests: 50
+
+env_variables:
+  OPENAI_API_KEY: 'YOUR-OPENAI-KEY'
+  CLOUD_STORAGE_BUCKET: researchgpt.appspot.com

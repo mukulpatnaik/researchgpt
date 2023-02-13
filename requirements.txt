@@ -7,6 +7,6 @@ flask-cors
 matplotlib
 scipy
 plotly
-redis==4.4.2
+google-cloud-storage
 gunicorn==20.1.0
 scikit-learn==0.24.1

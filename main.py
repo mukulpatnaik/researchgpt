@@ -7,15 +7,15 @@ import openai
 import os
 import requests
 from flask_cors import CORS
-import redis
 from _md5 import md5
-# from google.cloud import storage
+from google.cloud import storage
 
 app = Flask(__name__)
-db=redis.from_url(os.environ['REDISCLOUD_URL'])
+# db=redis.from_url(os.environ['REDISCLOUD_URL'])
 # db = redis.StrictRedis(host='localhost', port=6379, db=0)
+# os.environ['CLOUD_STORAGE_BUCKET'] = 'researchgpt.appspot.com'
+CLOUD_STORAGE_BUCKET = os.environ['CLOUD_STORAGE_BUCKET']
 CORS(app)
-
 
 class Chatbot():
     
@@ -146,21 +146,41 @@ class Chatbot():
 def index():
     return render_template("index.html")
 
+@app.route('/_ah/warmup')
+def warmup():
+    # Handle your warmup logic here, e.g. set up a database connection pool
+    return 200
+
 @app.route("/process_pdf", methods=['POST'])
 def process_pdf():
     print("Processing pdf")
-    key = md5(request.data).hexdigest()
-    print(key)
     file = request.data
+
+    key = md5(file).hexdigest()
+    print(key)
+    # Create a Cloud Storage client.
+    gcs = storage.Client()
+    name = key+'.json'
+
+    # Get the bucket that the file will be uploaded to.
+    bucket = gcs.get_bucket(CLOUD_STORAGE_BUCKET)
+    # Check if the file already exists
+    if bucket.blob(name).exists():
+        print("File already exists")
+        print("Done processing pdf")
+        return {"key": key}
+
     pdf = PdfReader(BytesIO(file))
     chatbot = Chatbot()
     paper_text = chatbot.parse_paper(pdf)
     df = chatbot.paper_df(paper_text)
     df = chatbot.calculate_embeddings(df)
-    if db.get(key) is None:
-        db.set(key, df.to_json())
-    # print(db.set(key, df.to_json()))
-    # print(db.get(key))
+    
+    # Create a new blob and upload the file's content.
+    blob = bucket.blob(name)
+    blob.upload_from_string(df.to_json(), content_type='application/json')
+    # if db.get(key) is None:
+    #     db.set(key, df.to_json())
     print("Done processing pdf")
     return {"key": key}
 
@@ -170,12 +190,27 @@ def download_pdf():
     url = request.json['url']
     r = requests.get(str(url))
     key = md5(r.content).hexdigest()
+
+    # Create a Cloud Storage client.
+    gcs = storage.Client()
+    name = key+'.json'
+
+    # Get the bucket that the file will be uploaded to.
+    bucket = gcs.get_bucket(CLOUD_STORAGE_BUCKET)
+    # Check if the file already exists
+    if bucket.blob(name).exists():
+        print("File already exists")
+        print("Done processing pdf")
+        return {"key": key}
+
     pdf = PdfReader(BytesIO(r.content))
     paper_text = chatbot.parse_paper(pdf)
     df = chatbot.paper_df(paper_text)
     df = chatbot.calculate_embeddings(df)
-    if db.get(key) is None:
-        db.set(key, df.to_json())
+
+    # Create a new blob and upload the file's content.
+    blob = bucket.blob(name)
+    blob.upload_from_string(df.to_json(), content_type='application/json')
     print("Done processing pdf")
     return {"key": key}
 
@@ -185,7 +220,11 @@ def reply():
     key = request.json['key']
     query = request.json['query']
     query = str(query)
-    df = pd.read_json(BytesIO(db.get(key)))
+    # df = pd.read_json(BytesIO(db.get(key)))
+    gcs = storage.Client()
+    bucket = gcs.get_bucket(CLOUD_STORAGE_BUCKET)
+    blob = bucket.blob(key+'.json')
+    df = pd.read_json(BytesIO(blob.download_as_string()))
     print(df.head(5))
     prompt = chatbot.create_prompt(df, query)
     response = chatbot.gpt(prompt)
