@@ -19,7 +19,7 @@ CORS(app)
 
 class Chatbot():
     
-    def parse_paper(self, pdf):
+    def extract_text(self, pdf):
         print("Parsing paper")
         number_of_pages = len(pdf.pages)
         print(f"Total number of pages: {number_of_pages}")
@@ -71,7 +71,7 @@ class Chatbot():
         # print(paper_text)
         return paper_text
 
-    def paper_df(self, pdf):
+    def create_df(self, pdf):
         print('Creating dataframe')
         filtered_pdf= []
         for row in pdf:
@@ -86,7 +86,7 @@ class Chatbot():
         print('Done creating dataframe')
         return df
 
-    def calculate_embeddings(self, df):
+    def embeddings(self, df):
         print('Calculating embeddings')
         openai.api_key = os.getenv('OPENAI_API_KEY')
         embedding_model = "text-embedding-ada-002"
@@ -95,7 +95,7 @@ class Chatbot():
         print('Done calculating embeddings')
         return df
 
-    def search_embeddings(self, df, query, n=3, pprint=True):
+    def search(self, df, query, n=3, pprint=True):
         query_embedding = get_embedding(
             query,
             engine="text-embedding-ada-002"
@@ -172,9 +172,9 @@ def process_pdf():
 
     pdf = PdfReader(BytesIO(file))
     chatbot = Chatbot()
-    paper_text = chatbot.parse_paper(pdf)
-    df = chatbot.paper_df(paper_text)
-    df = chatbot.calculate_embeddings(df)
+    paper_text = chatbot.extract_text(pdf)
+    df = chatbot.create_df(paper_text)
+    df = chatbot.embeddings(df)
     
     # Create a new blob and upload the file's content.
     blob = bucket.blob(name)
@@ -204,9 +204,9 @@ def download_pdf():
         return {"key": key}
 
     pdf = PdfReader(BytesIO(r.content))
-    paper_text = chatbot.parse_paper(pdf)
-    df = chatbot.paper_df(paper_text)
-    df = chatbot.calculate_embeddings(df)
+    paper_text = chatbot.extract_text(pdf)
+    df = chatbot.create_df(paper_text)
+    df = chatbot.embeddings(df)
 
     # Create a new blob and upload the file's content.
     blob = bucket.blob(name)
