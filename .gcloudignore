@@ -12,6 +12,7 @@
 # below:
 .git
 .gitignore
+main-local.py
 
 # Python pycache:
 __pycache__/
