@@ -6,7 +6,7 @@ You can try a demo here: http://researchgpt.ue.r.appspot.com
 
 ## Example 
 
-![Example Screenshot](https://mukuls-public-playground.s3.us-east-2.amazonaws.com/demo.gif)
+https://user-images.githubusercontent.com/36257370/218764852-32b79201-4767-4684-980a-73aa81e7d72a.mp4
 
 ## Installation
 
