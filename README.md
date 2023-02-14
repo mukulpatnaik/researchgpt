@@ -4,6 +4,10 @@ This is a flask app provides an interface to enable a conversation with a resear
 
 You can try a demo here: http://researchgpt.ue.r.appspot.com
 
+## Example 
+
+![Example Screenshot](https://mukuls-public-playground.s3.us-east-2.amazonaws.com/demo.gif)
+
 ## Installation
 
 ```bash
@@ -34,7 +38,3 @@ To stream logs:
 ```bash
 gcloud app logs tail
 ```
-
-## Example Screenshot
-
-![Example Screenshot](demo.png)
