@@ -114,7 +114,7 @@ class Chatbot():
         return results.head(n)
     
     def create_prompt(self, df, user_input):
-        result = self.search_embeddings(df, user_input, n=3)
+        result = self.search(df, user_input, n=3)
         print(result)
         prompt = """You are a large language model whose expertise is reading and summarizing scientific papers. 
         You are given a query and a series of text embeddings from a paper in order of their cosine similarity to the query.
@@ -188,7 +188,10 @@ def process_pdf():
 def download_pdf():
     chatbot = Chatbot()
     url = request.json['url']
-    r = requests.get(str(url))
+    r = requests.get(str('https://api.codetabs.com/v1/proxy?quest='+url))
+    print("Downloading pdf")
+    print(r.status_code)
+    # print(r.content)
     key = md5(r.content).hexdigest()
 
     # Create a Cloud Storage client.
