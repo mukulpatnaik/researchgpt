@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function() {
   // This file contains the JavaScript code for the web app
 
 const input = document.querySelector("input[type='file']");
-const uploadBtn = document.querySelector(".upload-btn");
+var uploadBtn = document.querySelector(".upload-btn");
 const viewer = document.querySelector("#pdf-viewer");
 const container = document.querySelector("#container");
 var x = document.querySelector("input[name='pdf-url']");
@@ -96,9 +96,17 @@ x.addEventListener("focus", function() {
 y.addEventListener("submit", function(event) {
     event.preventDefault();
     const url = this.elements["pdf-url"].value;
+    if (url === "") {
+        return;
+    }
+    // if the url does not end with .pdf, make x.value = "Error: URL does not end with .pdf"
+    if (!url.endsWith(".pdf")) {
+        x.value = "Error: URL does not end with .pdf";
+        return;
+    }
     x.value = "Loading...";
     console.log(url);
-    fetch('https://api.codetabs.com/v1/proxy?quest='+url)
+    fetch(url)
     .then(response => response.blob())
     .then(pdfBlob => {
         console.log(pdfBlob);
@@ -133,14 +141,18 @@ y.addEventListener("submit", function(event) {
           'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type, Authorization'
       }
-  })
-  .then(response => response.json())
-  // Append the reply to #chat as a simple paragraph without any styling
-  .then(data => {
-    chat.removeChild(loading);
-    window.key = data.key;
-  });
-
+      })
+      .then(response => response.json())
+      // Append the reply to #chat as a simple paragraph without any styling
+      .then(data => {
+        chat.removeChild(loading);
+        window.key = data.key;
+      })
+      .catch(error => {
+        uploadBtn.innerHTML = "Error: Request to server failed. Please try again. Check the URL if there is https:// at the beginning. If not, add it.";
+        x.innerHTML = "Error: Request to server failed. Please try again. Check the URL if there is https:// at the beginning. If not, add it.";
+        console.error(error);
+      });
 });
 
 input.addEventListener("change", async function() {
@@ -171,7 +183,12 @@ input.addEventListener("change", async function() {
   .then(data => {
     chat.removeChild(loading);
     window.key = data.key;
+  })
+  .catch(error => {
+    loading.innerHTML = "Error: Processing the pdf failed due to excess load. Please try again later.  Check the URL if there is https:// at the beginning. If not, add it.";
+    console.error(error);
   });
+    
   pdfjsLib.getDocument(fileArrayBuffer).promise.then(pdfDoc => {
   viewer.src = URL.createObjectURL(file);
   uploadBtn.style.display = "none";

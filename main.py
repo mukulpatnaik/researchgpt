@@ -150,6 +150,9 @@ def index():
 @app.route("/process_pdf", methods=['POST'])
 def process_pdf():
     print("Processing pdf")
+    print(request)
+    # print('the data')
+    # print(request.data)
     file = request.data
 
     key = md5(file).hexdigest()
@@ -182,9 +185,12 @@ def process_pdf():
 
 @app.route("/download_pdf", methods=['POST'])
 def download_pdf():
+    print("Downloading pdf")
+    print(request)
+    print(request.json['url'])
     chatbot = Chatbot()
     url = request.json['url']
-    r = requests.get(str('https://api.codetabs.com/v1/proxy?quest='+url))
+    r = requests.get(str(url))    
     print("Downloading pdf")
     print(r.status_code)
     # print(r.content)
@@ -219,6 +225,7 @@ def reply():
     key = request.json['key']
     query = request.json['query']
     query = str(query)
+    print(query)
     # df = pd.read_json(BytesIO(db.get(key)))
     gcs = storage.Client()
     bucket = gcs.get_bucket(CLOUD_STORAGE_BUCKET)
