@@ -1,6 +1,7 @@
 flask
 PyPDF2
 pandas
+aiohttp
 openai
 requests
 flask-cors
