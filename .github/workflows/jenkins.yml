@@ -21,7 +21,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: build-artifacts
-          path: path/to/artifacts
+          path: actions/upload-artifact
 
       - name: Trigger Jenkins build
         uses: appleboy/jenkins-action@master
