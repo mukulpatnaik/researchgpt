@@ -1,0 +1,17 @@
+MLOPs – Spring 2023
+Assignment#1
+Group Members
+Mehmood Amjad 
+19I-0472
+
+Muhammad
+19I-0561
+
+Repository: https://github.com/mukulpatnaik/researchgpt
+The repository we used contained a project where a flask application was used to establish a communication with open AI on any sort of research paper. 
+Findings:
+While doing this assignment, we came across a lot of things that made us understand a lot about Github Actions and Jenkins. Github Actions and Jenkins are two popular continuous integration and continuous delivery (CI/CD) tools used in software development. 
+Github Actions is a cloud-based service provided by Github that enables developers to automate workflows, build and test code, and deploy applications. 
+It is tightly integrated with Github and offers a simple, YAML-based syntax for defining workflows. 
+On the other hand, Jenkins is a self-hosted, open-source CI/CD tool that offers more flexibility and customization options than Github Actions. It supports a wide range of plugins and integrations, and can be used to automate all aspects of the software development process, from building and testing code to deploying applications to multiple environments. 
+Both Github Actions and Jenkins are widely used in the industry and offer a range of benefits to developers looking to streamline their development process.
