@@ -1,0 +1,33 @@
+name: Jenkins Build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build project
+        run: |
+          # Your build commands here
+
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-artifacts
+          path: path/to/artifacts
+
+      - name: Trigger Jenkins build
+        uses: appleboy/jenkins-action@master
+        with:
+          url: 'http://34.165.243.171:8080/job/GithubCI/2/'
+          token: ${{ secrets.JENKINS_TOKEN }}
+          user: ${{ secrets.JENKINS_USER}}
+          job: 'your-jenkins-job-name'
+          parameters: 'PARAMETER1=value1 PARAMETER2=value2'
