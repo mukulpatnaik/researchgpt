@@ -14,7 +14,4 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
-    - name: App
-      run: |
-        Python main-local.py
            
