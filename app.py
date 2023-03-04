@@ -8,7 +8,7 @@ import os
 import requests
 from flask_cors import CORS
 
-openai.api_key = os.getenv('OPENAI_API_KEY')
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
 CORS(app)
@@ -91,38 +91,37 @@ class Chatbot():
         print(sources)
         return results.head(n)
     
-    def create_prompt(self, df, user_input):
+    def create_messages(self, df, user_input):
         result = self.search_embeddings(df, user_input, n=3)
         print(result)
-        prompt = """You are a large language model whose expertise is reading and summarizing scientific papers. 
-        You are given a query and a series of text embeddings from a paper in order of their cosine similarity to the query.
-        You must take the given embeddings and return a very detailed summary of the paper that answers the query.
-            
-            Given the question: """+ user_input + """
-            
-            and the following embeddings as data: 
-            
-            1.""" + str(result.iloc[0]['text'][:150]) + """
-            2.""" + str(result.iloc[1]['text'][:150]) + """
-            3.""" + str(result.iloc[2]['text'][:150]) + """
+        
+        embeddings_1 = str(result.iloc[0]['text'][:150])
+        embeddings_2 = str(result.iloc[1]['text'][:150])
+        embeddings_3 = str(result.iloc[2]['text'][:150])
+        
+        system_role = f"""You are a large language model whose expertise is reading and summarizing scientific papers. You are given a query and a series of text embeddings from a paper in order of their cosine similarity to the query. You must take the given embeddings and return a very detailed summary of the paper in the languange of the query. The embeddings are as follows: 1. {embeddings_1}. 2. {embeddings_2}. 3. {embeddings_3}."""
+        
+        user_content = f"""Given the question: "{str(user_input)}". Return a detailed answer based on the paper:"""
+        
+        messages = [
+        {"role": "system", "content": system_role},
+        {"role": "user", "content": user_content},]
+        
+        print('Done creating messages')
+        return messages
 
-            Return a detailed answer based on the paper:"""
-
-        print('Done creating prompt')
-        return prompt
-
-    def gpt(self, prompt):
-        print('Sending request to GPT-3')
-        r = openai.Completion.create(model="text-davinci-003", prompt=prompt, temperature=0.4, max_tokens=1500)
-        answer = r.choices[0]['text']
-        print('Done sending request to GPT-3')
+    def gpt(self, messages):
+        print('Sending request to GPT-3.5-turbo')
+        r = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=messages, temperature=0.7, max_tokens=1500)
+        answer = r.choices[0]["message"]["content"]
+        print('Done sending request to GPT-3.5-turbo')
         response = {'answer': answer, 'sources': sources}
         return response
 
-    def reply(self, prompt):
-        print(prompt)
-        prompt = self.create_prompt(df, prompt)
-        return self.gpt(prompt)
+    def reply(self, messages):
+        print(messages)
+        messages = self.create_prompt(df, messages)
+        return self.gpt(messages)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -160,8 +159,8 @@ def reply():
     chatbot = Chatbot()
     query = request.json['query']
     query = str(query)
-    prompt = chatbot.create_prompt(df, query)
-    response = chatbot.gpt(prompt)
+    messages = chatbot.create_messages(df, query)
+    response = chatbot.gpt(messages)
     print(response)
     return response, 200
 
