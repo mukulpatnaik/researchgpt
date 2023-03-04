@@ -2,7 +2,8 @@
 
 This is a fork of the original [ResearchGPT](https://github.com/mukulpatnaik/researchgpt). I use it to study OpenAI's API and Microsoft's Azure. Partial original README is below.
 
-This is a flask app provides an interface to enable a conversation with a research paper. You can enter a link to a pdf hosted online or upload your own pdf. The app will then extract the text from the pdf, create embeddings from the text and use them with the openai api to generate a response to a question you ask. It will also return a source for the part of the text it used to generate the response and the page number. 
+This is a flask app provides an interface to enable a conversation with a research paper. You can enter a link to a pdf hosted online or upload your own pdf. The app will then extract the text from the pdf, create embeddings from the text and use them with the openai api to generate a response to a question you ask. It will also return a source for the part of the text it used to generate the response and the page number.
+
 ![home](/frontpage.png)
 
 ## Example 
@@ -35,8 +36,7 @@ flask run
 
 ### Microsoft Azure Deployment
 
-Follow the instructions [here](https://learn.microsoft.com/zh-cn/azure/app-service/quickstart-python?tabs=flask%2Cwindows%2Cazure-cli%2Cvscode-deploy%2Cdeploy-instructions-azportal%2Cterminal-bash%2Cdeploy-instructions-zip-azcli)
-Once you have the azure cli set up with `az login`, you can deploy with streamed logs:
+Follow the instructions [here](https://learn.microsoft.com/zh-cn/azure/app-service/quickstart-python?tabs=flask%2Cwindows%2Cazure-cli%2Cvscode-deploy%2Cdeploy-instructions-azportal%2Cterminal-bash%2Cdeploy-instructions-zip-azcli). Once you have the azure cli set up with `az login`, you can deploy with streamed logs:
 
 ```bash
 az webapp up --runtime PYTHON:3.9 --sku B1 --logs
