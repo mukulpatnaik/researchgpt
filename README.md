@@ -4,12 +4,16 @@ This is a fork of the original [ResearchGPT](https://github.com/mukulpatnaik/res
 
 This is a flask app provides an interface to enable a conversation with a research paper. You can enter a link to a pdf hosted online or upload your own pdf. The app will then extract the text from the pdf, create embeddings from the text and use them with the openai api to generate a response to a question you ask. It will also return a source for the part of the text it used to generate the response and the page number.
 
-![home](/frontpage.png)
+![home](/home.png)
 
 ## Example 
-This app supports query in multiple languange. Here is an example of a query in both English and Chinese:
+This web app supports query in multiple languange. Here is an example of a query in both English and Chinese:
 
 ![demo](/demo.png)
+
+This app also supports pdf files in the language other than English. Here is an example of a Chinese pdf file:
+
+![demo2](/demo2.png)
 ## Installation
 
 ```bash

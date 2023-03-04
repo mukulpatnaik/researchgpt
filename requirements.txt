@@ -1,5 +1,5 @@
 flask
-PyPDF2
+pdfplumber
 pandas
 openai
 requests

@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template
 from io import BytesIO
-from PyPDF2 import PdfReader
+import pdfplumber
 import pandas as pd
 from openai.embeddings_utils import get_embedding, cosine_similarity
 import openai
@@ -24,6 +24,7 @@ class Chatbot():
         for i in range(number_of_pages):
             page = pdf.pages[i]
             page_text = []
+            processed_text = []
 
             def visitor_body(text, cm, tm, fontDict, fontSize):
                 x = tm[4]
@@ -36,34 +37,15 @@ class Chatbot():
                     'x': x,
                     'y': y
                     })
-
-            _ = page.extract_text(visitor_text=visitor_body)
-
-            blob_font_size = None
-            blob_text = ''
-            processed_text = []
-
-            for t in page_text:
-                if t['fontsize'] == blob_font_size:
-                    blob_text += f" {t['text']}"
-                    if len(blob_text) >= 2000:
-                        processed_text.append({
-                            'fontsize': blob_font_size,
-                            'text': blob_text,
-                            'page': i
-                        })
-                        blob_font_size = None
-                        blob_text = ''
-                else:
-                    if blob_font_size is not None and len(blob_text) >= 1:
-                        processed_text.append({
-                            'fontsize': blob_font_size,
-                            'text': blob_text,
-                            'page': i
-                        })
-                    blob_font_size = t['fontsize']
-                    blob_text = t['text']
-                paper_text += processed_text
+            
+            processed_text.append(
+                {
+                    'text': page.extract_text(visitor_text=visitor_body),
+                    'page': i
+                }
+                                 )
+            
+            paper_text += processed_text
         print("Done parsing paper")
         # print(paper_text)
         return paper_text
@@ -120,9 +102,9 @@ class Chatbot():
             
             and the following embeddings as data: 
             
-            1.""" + str(result.iloc[0]['text']) + """
-            2.""" + str(result.iloc[1]['text']) + """
-            3.""" + str(result.iloc[2]['text']) + """
+            1.""" + str(result.iloc[0]['text'][:150]) + """
+            2.""" + str(result.iloc[1]['text'][:150]) + """
+            3.""" + str(result.iloc[2]['text'][:150]) + """
 
             Return a detailed answer based on the paper:"""
 
@@ -150,7 +132,7 @@ def index():
 def process_pdf():
     print("Processing pdf")
     file = request.data
-    pdf = PdfReader(BytesIO(file))
+    pdf = pdfplumber.open(BytesIO(file))
     chatbot = Chatbot()
     paper_text = chatbot.parse_paper(pdf)
     global df
@@ -165,7 +147,7 @@ def download_pdf():
     url = request.json['url']
     r = requests.get(str(url))
     print(r.headers)
-    pdf = PdfReader(BytesIO(r.content))
+    pdf = pdfplumber.open(BytesIO(r.content))
     paper_text = chatbot.parse_paper(pdf)
     global df
     df = chatbot.paper_df(paper_text)
