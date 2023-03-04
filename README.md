@@ -17,7 +17,7 @@ cd researchgpt
 pip install -r requirements.txt
 ```
 
-Also, you need to specify your OpenAI API key in the variable `openai.api_key` of `app.py`.
+Also, you need to have an OpenAI API key and set it as the environment variable 'OPENAI_API_KEY'.
 
 ## Usage
 
