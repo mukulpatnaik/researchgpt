@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <title>ResearchGPT</title>
     <script src="static/js/script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.3.122/build/pdf.min.js"></script>
     <link rel="stylesheet" href="static/css/styles.css">
   </head>
   <body>
-    <form id='url' style="margin-top: 320px; margin-bottom: 20px; width: 100%; text-align: center;">
+    <h1 style="color:white; font: 2.5em Arial"> ResearchGPT </h1>
+    <p style="color:white; font: 1em Arial; margin-top: 100px; width: 50%;"> This is a web app provides an interface to enable a conversation with a research paper. You can enter a link to a pdf hosted online or upload your own pdf. The app will then extract the text from the pdf, create embeddings from the text and use them with the openai api to generate a response to a question you ask. It will also return a source for the part of the text it used to generate the response and the page number. After finishing a paper, you may refresh the page to start a new conversation.
+    </p>
+    <form id='url' style="margin-top: 100px; margin-bottom: 20px; width: 100%; text-align: center;">
         <input type="text" name="pdf-url" placeholder="Enter URL" style="color: lightgray; padding: 10px; border: none; background-color: black; font: 1.2em Roboto; font-style: italic; width: 100%; text-align: center">
     </form>
-
     <p style="color: white; margin: 10px; /* padding: 10px; */ /* border-radius: 10px; */ /* background-color: grey; */ width: fit-content; /* max-width: 80%; */ text-align: start; overflow-wrap: break-word; /* font-style: normal; */ font-variant-caps: normal; /* font-weight: normal; */ /* font-stretch: normal; */ /* font-size: 1.2em; */ line-height: normal; font-family: Roboto;">or</p>
 
     <form id="up" style="margin-top: 50px; margin-left: 15px;" enctype="multipart/form-data">
@@ -22,7 +25,7 @@
             <div id="chat" style="height: 100%; overflow-y: scroll; background-color: black;">
               <!-- Chat messages go here -->
             </div>
-            <form style="display: flex; padding-left: 10px; margin-bottom: 10px; width: 100%;">
+            <form style="display: flex; padding-left: 10px; margin-bottom: 200px; width: 100%;">
               <input type="text" name='chat' style="font-size: 14px; flex-grow: 2; padding: 10px; border: none; background-color: black; color: white;" placeholder="Ask a question..." />
               <button id="send" style="background-color: transparent; border: none; padding: 10px 20px;">
                 <img src="static/send-icon.png" style="width: 20px; height: 20px;" />
@@ -30,6 +33,6 @@
             </form>
         </div>          
     </div>
-    <h2 style="color:white"> Note: This is a demo app. The PDFs are not stored on the server. When you input the link from the web, you must enter a complete link with .pdf suffix.</h2>
+    <p style="color:white; font: 1em Arial"> Note: This is a demo app. The PDFs are not stored on the server. When you input the link from the web, you must enter a <span style="color: white; font-style: italic;">complete link with .pdf suffix.</span></p>
   </body>
 </html>
