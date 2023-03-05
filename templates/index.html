@@ -9,14 +9,14 @@
   </head>
   <body>
     <h1 style="color:white; font: 2.5em Arial"> ResearchGPT </h1>
-    <p style="color:white; font: 1em Arial; margin-top: 100px; width: 50%;"> This is a web app provides an interface to enable a conversation with a research paper. You can enter a link to a pdf hosted online or upload your own pdf. The app will then extract the text from the pdf, create embeddings from the text and use them with the openai api to generate a response to a question you ask. It will also return a source for the part of the text it used to generate the response and the page number. After finishing a paper, you may refresh the page to start a new conversation.
+    <p style="color:white; font: 1em Arial; margin-top: 5%; width: 50%;"> This is a web app provides an interface to enable a conversation with a research paper. You can enter a link to a pdf hosted online or upload your own pdf. The app will then extract the text from the pdf, create embeddings from the text and use them with the openai api to generate a response to a question you ask. It will also return a source for the part of the text it used to generate the response and the page number. After finishing a paper, you may refresh the page to start a new conversation.
     </p>
-    <form id='url' style="margin-top: 100px; margin-bottom: 20px; width: 100%; text-align: center;">
+    <form id='url' style="margin-top: 5%; margin-bottom: 1%; width: 100%;">
         <input type="text" name="pdf-url" placeholder="Enter URL" style="color: lightgray; padding: 10px; border: none; background-color: black; font: 1.2em Roboto; font-style: italic; width: 100%; text-align: center">
     </form>
-    <p style="color: white; margin: 10px; /* padding: 10px; */ /* border-radius: 10px; */ /* background-color: grey; */ width: fit-content; /* max-width: 80%; */ text-align: start; overflow-wrap: break-word; /* font-style: normal; */ font-variant-caps: normal; /* font-weight: normal; */ /* font-stretch: normal; */ /* font-size: 1.2em; */ line-height: normal; font-family: Roboto;">or</p>
+    <p style="color: white; margin: 0.5%; /* padding: 0.5%; */ /* border-radius: 10px; */ /* background-color: grey; */ width: fit-content; /* max-width: 80%; */ text-align: start; overflow-wrap: break-word; /* font-style: normal; */ font-variant-caps: normal; /* font-weight: normal; */ /* font-stretch: normal; */ /* font-size: 1em; */ line-height: normal; font-family: Roboto;">or</p>
 
-    <form id="up" style="margin-top: 50px; margin-left: 15px;" enctype="multipart/form-data">
+    <form id="up" style="margin-top: 2.5%;" enctype="multipart/form-data">
       <label for="file-input" class="upload-btn">Upload PDF</label>
       <input type="file" accept=".pdf" id="file-input"/>
     </form>
@@ -34,6 +34,7 @@
             </form>
         </div>          
     </div>
-    <p style="color:white; font: 1em Arial"> Note: This is a demo app. The PDFs are not stored on the server. When you input the link from the web, you must enter a <span style="color: white; font-style: italic;">complete link with .pdf suffix.</span></p>
+    <p style="color:white;">Development build. Version 0.3</p>
+    <p style="color:white; font: 1em Arial"> Note: This is a demo app. The PDFs are not stored on the server. When you input the link from the web, you must enter a <span style="color: white; font-style: italic;">complete link with .pdf suffix.</span></p> 
   </body>
 </html>

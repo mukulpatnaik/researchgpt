@@ -62,6 +62,8 @@ class Chatbot():
         # remove elements with identical df[text] and df[page] values
         df = df.drop_duplicates(subset=['text', 'page'], keep='first')
         df['length'] = df['text'].apply(lambda x: len(x))
+        global title 
+        title = df["text"][0][:100]
         print('Done creating dataframe')
         return df
 
@@ -99,7 +101,7 @@ class Chatbot():
         embeddings_2 = str(result.iloc[1]['text'][:150])
         embeddings_3 = str(result.iloc[2]['text'][:150])
         
-        system_role = f"""You are a large language model whose expertise is reading and summarizing scientific papers. You are given a query and a series of text embeddings from a paper in order of their cosine similarity to the query. You must take the given embeddings and return a very detailed summary of the paper in the languange of the query. The embeddings are as follows: 1. {embeddings_1}. 2. {embeddings_2}. 3. {embeddings_3}."""
+        system_role = f"""Act as an academician whose expertise is reading and summarizing scientific papers. You are given a query, a series of text embeddings and the title from a paper in order of their cosine similarity to the query. You must take the given embeddings and return a very detailed summary of the paper in the languange of the query. The embeddings are as follows: 1. {embeddings_1}. 2. {embeddings_2}. 3. {embeddings_3}. The title of the paper is: {title}"""
         
         user_content = f"""Given the question: "{str(user_input)}". Return a detailed answer based on the paper:"""
         

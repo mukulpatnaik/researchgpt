@@ -54,3 +54,16 @@ Follow the instructions [here](https://learn.microsoft.com/zh-cn/azure/app-servi
 ```bash
 az webapp up --runtime PYTHON:3.9 --sku B1 --logs
 ```
+
+## Limitations
+Due to the PDF to text conversion and embedding construction technique, the web app is limited to handle papers with headers (see screenshots below for examples) and can respond unexpectedly. We are working on improving the app to handle more papers.
+
+|With Header|Without Header|
+|---|---|
+|![header](/header.png)|![noheader](/noheader.png)|
+
+
+
+
+
+

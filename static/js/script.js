@@ -128,7 +128,7 @@ y.addEventListener("submit", function(event) {
     var loading = document.createElement("p");
     loading.style.color = "lightgray";
     loading.style.fontSize = "14px";
-    loading.innerHTML = "Calculating embeddings...";
+    loading.innerHTML = "Calculating embeddings... Please send your questions after this message disappears.";
     chat.appendChild(loading);
 
     // Make a POST request to the server 'myserver/download-pdf' with the URL
