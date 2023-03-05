@@ -9,16 +9,16 @@ I use this repository to study OpenAI's API and Microsoft's Azure. The partial o
 
 This is a flask app provides an interface to enable a conversation with a research paper. You can enter a link to a pdf hosted online or upload your own pdf. The app will then extract the text from the pdf, create embeddings from the text and use them with the openai api to generate a response to a question you ask. It will also return a source for the part of the text it used to generate the response and the page number.
 
-![home](/home.png)
+![home](/images/home.png)
 
 ## Example 
 This web app supports query in multiple languange. Here is an example of a query in both English and Chinese:
 
-![demo](/demo.png)
+![demo](/images/demo.png)
 
 This app also supports pdf files in the language other than English. Here is an example of a Chinese pdf file:
 
-![demo2](/demo2.png)
+![demo2](/images/demo2.png)
 ## Installation
 
 ```bash
@@ -60,7 +60,7 @@ Due to the PDF to text conversion and embedding construction technique, the web 
 
 |With Header|Without Header|
 |---|---|
-|![header](/header.png)|![noheader](/noheader.png)|
+|![header](/images/header.png)|![noheader](/images/noheader.png)|
 
 
 
