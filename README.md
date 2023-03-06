@@ -3,6 +3,7 @@
 This is a fork of the original [ResearchGPT](https://github.com/mukulpatnaik/researchgpt). The current version modifies several settings from the original:
 - Use `GPT-3.5-turbo` instead of `GPT-3.5` (the original uses `GPT-3`).
 - Add multi-language support.
+- Improved results for journal papers (See compare results below).
 - Slight modification of the frontend.
 
 I use this repository to study OpenAI's API and Microsoft's Azure. The partial original README is below. 
@@ -56,11 +57,17 @@ az webapp up --runtime PYTHON:3.9 --sku B1 --logs
 ```
 
 ## Limitations
-Due to the PDF to text conversion and embedding construction technique, the web app is limited to handle papers with headers (see screenshots below for examples) and can respond unexpectedly. We are working on improving the app to handle more papers.
+Due to the PDF to text conversion and embedding construction technique, the web app is limited to handle papers with headers (see screenshots below for examples) and can respond unexpectedly (For instance, return the header information). Comparing to the original version, this version has specifically targeted at this problem and making improvements. We are continuing working on improving the app to give better respond.
 
 |With Header|Without Header|
 |---|---|
 |![header](/images/header.png)|![noheader](/images/noheader.png)|
+
+The improved results can be seen as follows:
+
+|With Header (This fork)|With Header (Original)|
+|---|---|
+|![header](/images/improved.png)|![noheader](/images/orig.png)|
 
 
 
