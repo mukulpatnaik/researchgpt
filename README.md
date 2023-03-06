@@ -63,7 +63,7 @@ Due to the PDF to text conversion and embedding construction technique, the web 
 |---|---|
 |![header](/images/header.png)|![noheader](/images/noheader.png)|
 
-The improved results can be seen as follows:
+The improved results can be seen as follows (Click for full-sized image):
 
 |With Header (This fork)|With Header (Original)|
 |---|---|
