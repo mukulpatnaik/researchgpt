@@ -155,6 +155,10 @@ def process_pdf():
     global df
     df = chatbot.paper_df(paper_text)
     df = chatbot.calculate_embeddings(df)
+    chatbot = Chatbot()
+    title_request = chatbot.get_title(title_related)
+    global title
+    title = chatbot.gpt(title_request)
     print("Done processing pdf")
     return {'key': ''}
 
