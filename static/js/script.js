@@ -113,6 +113,7 @@ y.addEventListener("submit", function(event) {
         const pdfUrl = URL.createObjectURL(pdfBlob);
         pdfjsLib.getDocument(pdfUrl).promise.then(pdfDoc => {
             viewer.src = pdfUrl;
+            or.style.display = "none";
             uploadBtn.style.display = "none";
             form.style.display = "none";
             form.style.marginTop = "0px";
@@ -191,6 +192,7 @@ input.addEventListener("change", async function() {
     
   pdfjsLib.getDocument(fileArrayBuffer).promise.then(pdfDoc => {
   viewer.src = URL.createObjectURL(file);
+  or.style.display = "none";
   uploadBtn.style.display = "none";
   form.style.display = "none";
   form.style.marginTop = "0px";
