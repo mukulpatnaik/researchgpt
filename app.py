@@ -62,8 +62,8 @@ class Chatbot():
         # remove elements with identical df[text] and df[page] values
         df = df.drop_duplicates(subset=['text', 'page'], keep='first')
         df['length'] = df['text'].apply(lambda x: len(x))
-        global title 
-        title = df["text"][0][:100]
+        global title_related 
+        title_related = df["text"][0][:300]
         print('Done creating dataframe')
         return df
 
@@ -93,7 +93,20 @@ class Chatbot():
         print(sources)
         return results.head(n)
     
-    def create_messages(self, df, user_input):
+    def get_title(self, title_related):
+        system_role = f"""I have a string contains a title of a paper. I want to extract the title of the paper."""
+        
+        user_content = f"""Given the string: "{str(title_related)}". Return the title of the paper. Do not return any additional text."""
+        
+        messages = [
+        {"role": "system", "content": system_role},
+        {"role": "user", "content": user_content},]
+        
+        print('Done extracting title')
+        return messages
+        
+    
+    def create_messages(self, df, user_input, title):
         result = self.search_embeddings(df, user_input, n=3)
         print(result)
         
@@ -117,7 +130,10 @@ class Chatbot():
         r = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=messages, temperature=0.7, max_tokens=1500)
         answer = r.choices[0]["message"]["content"]
         print('Done sending request to GPT-3.5-turbo')
-        response = {'answer': answer, 'sources': sources}
+        if 'sources' in globals().keys():
+            response = {'answer': answer, 'sources': sources}
+        else:
+            response = {'answer': answer.replace("\n", "")}
         return response
 
     def reply(self, messages):
@@ -153,6 +169,10 @@ def download_pdf():
     global df
     df = chatbot.paper_df(paper_text)
     df = chatbot.calculate_embeddings(df)
+    chatbot = Chatbot()
+    title_request = chatbot.get_title(title_related)
+    global title
+    title = chatbot.gpt(title_request)
     print("Done processing pdf")
     return {'key': ''}
 
@@ -161,7 +181,7 @@ def reply():
     chatbot = Chatbot()
     query = request.json['query']
     query = str(query)
-    messages = chatbot.create_messages(df, query)
+    messages = chatbot.create_messages(df, query, title)
     response = chatbot.gpt(messages)
     print(response)
     return response, 200
