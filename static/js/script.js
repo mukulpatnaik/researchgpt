@@ -59,6 +59,7 @@ send.addEventListener("click", function(event) {
       sources.forEach(function(source) {
         for (var page in source) {
           var p = document.createElement("p");
+          p.display = "flex";
           p.style.color = "gray";
           p.style.fontSize = "12px";
           p.style.fontWeight = "bold";
