@@ -1,12 +1,12 @@
 # ResearchGPT
 
 This is a fork of the original [ResearchGPT](https://github.com/mukulpatnaik/researchgpt). The current version modifies several settings from the original:
-- Use `GPT-3.5-turbo` instead of `GPT-3.5` (the original uses `GPT-3`).
+- Use `GPT-3.5-turbo` instead of `GPT-3`.
 - Add multi-language support.
 - Improved results for journal papers (See compare results below).
 - Slight modification of the frontend.
 
-I use this repository to study OpenAI's API and Microsoft's Azure. The partial original README is below. 
+I use this repository to study OpenAI's API, Microsoft's Azure, GitHub Pages, and CI/CD. The partial original README is below. 
 
 This is a flask app provides an interface to enable a conversation with a research paper. You can enter a link to a pdf hosted online or upload your own pdf. The app will then extract the text from the pdf, create embeddings from the text and use them with the openai api to generate a response to a question you ask. It will also return a source for the part of the text it used to generate the response and the page number.
 
