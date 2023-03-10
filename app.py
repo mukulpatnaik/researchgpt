@@ -25,6 +25,8 @@ class Chatbot():
         print(f"Total number of pages: {number_of_pages}")
         title_related = []
         paper_text = []
+        misc_text = []
+        ismisc = False
         for i in range(number_of_pages):
             page = pdf.pages[i]
             if i == 0:
@@ -33,13 +35,16 @@ class Chatbot():
                 isfirstpage = False
             
             page_text = []
+            misc_page_text = []
             sentences = []
+            misc_sentences = []
             processed_text = []
+            misc_processed_text = []
 
-            def visitor_body(text, isfirstpage, x, top, bottom, fontSize):
+            def visitor_body(text, isfirstpage, x, top, bottom, fontSize, ismisc):
                 # ignore header/footer
                 if isfirstpage:
-                    if (top <= 260) and (len(text.strip()) > 1): # Header Region, specifically treated for title-realated information
+                    if (top <= 300) and (len(text.strip()) > 1): # Header Region, specifically treated for title-realated information
                         title_related.append({
                         'fontsize': fontSize,
                         'text': ' ' + text.strip().replace('\x03', ''),
@@ -47,7 +52,7 @@ class Chatbot():
                         'y': top
                         })
 
-                    if (top > 260 and bottom < 720) and (len(text.strip()) > 1):
+                    if (top > 300 and bottom < 720) and (len(text.strip()) > 1):
                         sentences.append({
                         'fontsize': fontSize,
                         'text': ' ' + text.strip().replace('\x03', ''),
@@ -55,30 +60,52 @@ class Chatbot():
                         'y': top
                         })
                 else: # not first page
-                    if (top > 180 and bottom < 720) and (len(text.strip()) > 1):
-                        sentences.append({
-                        'fontsize': fontSize,
-                        'text': ' ' + text.strip().replace('\x03', ''),
-                        'x': x,
-                        'y': top
-                        })
-            
+                    if (top > 70 and bottom < 720) and (len(text.strip()) > 1) and not ismisc: # main text region
+                            sentences.append({
+                            'fontsize': fontSize,
+                            'text': ' ' + text.strip().replace('\x03', ''),
+                            'x': x,
+                            'y': top
+                            })
+                    elif (top > 70 and bottom < 720) and (len(text.strip()) > 1) and ismisc:
+                        misc_sentences.append({
+                            'fontsize': fontSize,
+                            'text': ' ' + text.strip().replace('\x03', ''),
+                            'x': x,
+                            'y': top
+                            })
+                        
             extracted_words = page.extract_words(x_tolerance=3, y_tolerance=3, keep_blank_chars=False, use_text_flow=True, horizontal_ltr=True, vertical_ttb=True, extra_attrs=["fontname", "size"], split_at_punctuation=False)
             
-            # Treat the first page differently, specifically targeted at headers
+            # Treat the first page, main text, and references differently, specifically targeted at headers
             for extracted_word in extracted_words: 
-                visitor_body(extracted_word['text'], isfirstpage, extracted_word['x0'], extracted_word['top'], extracted_word['bottom'], extracted_word['size'])
+                if 'References' in extracted_word['text'].strip().replace('\x03', '') or 'REFERENCES' in extracted_word['text'].strip().replace('\x03', '') or 'Bibliography' in extracted_word['text'].strip().replace('\x03', '') or 'BIBLIOGRAPHY' in extracted_word['text'].strip().replace('\x03', '') or 'Acknowledgements' in extracted_word['text'].strip().replace('\x03', '') or 'ACKNOWLEDGEMENTS' in extracted_word['text'].strip().replace('\x03', '') or 'Acknowledgments' in extracted_word['text'].strip().replace('\x03', '') or 'ACKNOWLEDGMENTS' in extracted_word['text'].strip().replace('\x03', '') or '参考文献' in extracted_word['text'].strip().replace('\x03', '') or '致谢' in extracted_word['text'].strip().replace('\x03', ''): # ignore references and acknowledgements
+                    ismisc = True    
+                visitor_body(extracted_word['text'], isfirstpage, extracted_word['x0'], extracted_word['top'], extracted_word['bottom'], extracted_word['size'], ismisc=ismisc)
             
-            for j in range(len(sentences)-1):
-                if len(sentences[j]['text']) < 100 and sentences[j]['fontsize'] == sentences[j+1]['fontsize']: # average length of a sentence
-                    sentences[j+1]['text'] = f"{sentences[j]['text']}" + sentences[j+1]['text']
-                else:
-                    page_text.append(sentences[j])
+            if sentences != []:
+                for j in range(len(sentences)-1):
+                    if len(sentences[j]['text']) < 100 and sentences[j]['fontsize'] == sentences[j+1]['fontsize']: # average length of a sentence
+                        sentences[j+1]['text'] = f"{sentences[j]['text']}" + sentences[j+1]['text']
+                    else:
+                        page_text.append(sentences[j])
+            
+            if ismisc == True:
+                for j in range(len(misc_sentences)-1):
+                    if len(misc_sentences[j]['text']) < 100 and misc_sentences[j]['fontsize'] == misc_sentences[j+1]['fontsize']: # average length of a sentence
+                        misc_sentences[j+1]['text'] = f"{misc_sentences[j]['text']}" + misc_sentences[j+1]['text']
+                    else:
+                        misc_page_text.append(misc_sentences[j])
             
             blob_font_sizes = []
             blob_font_size = None
             blob_text = ''
             processed_text = []
+            if ismisc == True:
+                misc_blob_font_sizes = []
+                misc_blob_font_size = None
+                misc_blob_text = ''
+                misc_processed_text = []
             tolerance = 0.5
             
             # Preprocessing for title font size
@@ -91,29 +118,63 @@ class Chatbot():
                 for r in title_related:
                     if title_font_size - tolerance <= r['fontsize'] <= title_font_size + tolerance:
                         title_clean.append(r['text'])
+                
+                title_sentence = ' '.join(title_clean)
             
             # Preprocessing for main text font size
-            for t in page_text:
-                blob_font_sizes.append(t['fontsize'])
-            blob_font_size = Counter(blob_font_sizes).most_common(1)[0][0]
+            if page_text != []:
+                for t in page_text:
+                    blob_font_sizes.append(t['fontsize'])
+                blob_font_size = Counter(blob_font_sizes).most_common(1)[0][0]
             
-            for t in range(len(page_text)):
-                if blob_font_size - tolerance <= page_text[t]['fontsize'] <= blob_font_size + tolerance:
-                    blob_text += f"{page_text[t]['text']}"
-                    if len(blob_text) >= 500: # set the length of a data chunk
-                        processed_text.append({
-                            'text': blob_text,
-                            'page': i+1
-                        })
-                        blob_text = ''
-                    elif t == len(page_text)-1: # last element
-                        processed_text.append({
-                            'text': blob_text,
-                            'page': i+1
-                        })
-            paper_text += processed_text
+            if ismisc == True:
+            # Preprocessing for misc text font size
+                for s in misc_page_text:
+                    misc_blob_font_sizes.append(s['fontsize'])
+                misc_blob_font_size = Counter(misc_blob_font_sizes).most_common(1)[0][0]
+            
+            if page_text != []:
+                for t in range(len(page_text)):
+                    if blob_font_size - tolerance <= page_text[t]['fontsize'] <= blob_font_size + tolerance:
+                        blob_text += f"{page_text[t]['text']}"
+                        if len(blob_text) >= 500: # set the length of a data chunk
+                            processed_text.append({
+                                'text': blob_text,
+                                'page': i+1
+                            })
+                            blob_text = ''
+                        elif t == len(page_text)-1: # last element
+                            processed_text.append({
+                                'text': blob_text,
+                                'page': i+1
+                            })
+                paper_text += processed_text
+            
+            if ismisc == True:
+                for s in range(len(misc_page_text)):
+                    if misc_blob_font_size - tolerance <= misc_page_text[s]['fontsize'] <= misc_blob_font_size + tolerance:
+                        misc_blob_text += f"{misc_page_text[s]['text']}"
+                        if len(misc_blob_text) >= 500: # set the length of a data chunk
+                            misc_processed_text.append({
+                                'text': misc_blob_text,
+                                'page': i+1
+                            })
+                            misc_blob_text = ''
+                        elif s == len(misc_page_text)-1: # last element
+                            misc_processed_text.append({
+                                'text': misc_blob_text,
+                                'page': i+1
+                            })
+                misc_text += misc_processed_text
         print("Done parsing paper")
-        return paper_text, title_clean[:3]
+        
+        # title judgement
+        if len(title_clean) != 1:
+            for i in range(3): # try 3 times
+                if len(title_clean[i]) > 30:
+                    title_sentence = title_clean[i]
+                    break
+        return paper_text, misc_text, title_sentence
 
     def paper_df(self, pdf):
         print('Creating dataframe')
@@ -169,10 +230,15 @@ class Chatbot():
         return messages
     
     
-    def create_messages(self, df, user_input, title):
-        result = self.search_embeddings(df, user_input, n=int(math.log2(number_of_pages)))
-        print(result)
-        
+    def create_messages(self, df, user_input, title, *df_misc):
+        if df_misc == None:
+            result = self.search_embeddings(df, user_input, n=int(math.log2(number_of_pages)))
+            print(result)
+        else:
+            df = df.append(df_misc)
+            result = self.search_embeddings(df, user_input, n=int(math.log2(number_of_pages)))
+            print(result)
+            
         total_max_string = 2000
         max_string = total_max_string // int(math.log2(number_of_pages))
         
@@ -206,11 +272,6 @@ class Chatbot():
             response = {'answer': answer.replace("\n", "")}
         return response
 
-    def reply(self, messages):
-        print(messages)
-        messages = self.create_prompt(df, messages)
-        return self.gpt(messages)
-
 @app.route("/", methods=["GET", "POST"])
 def index():
     return render_template("index.html")
@@ -221,10 +282,13 @@ def process_pdf():
     file = request.data
     pdf = pdfplumber.open(BytesIO(file))
     chatbot = Chatbot()
-    paper_text, title_related = chatbot.parse_paper(pdf)
-    global df
-    df = chatbot.paper_df(paper_text)
-    df = chatbot.calculate_embeddings(df)
+    paper_text, misc_text, title_related = chatbot.parse_paper(pdf)
+    global df_main, df_misc
+    df_main = chatbot.paper_df(paper_text)
+    df_main = chatbot.calculate_embeddings(df_main)
+    if misc_text != []:
+        df_misc = chatbot.paper_df(misc_text)
+        df_misc = chatbot.calculate_embeddings(df_misc)
     chatbot = Chatbot()
     title_request = chatbot.get_title(title_related)
     global title
@@ -239,10 +303,13 @@ def download_pdf():
     r = requests.get(str(url))
     print(r.headers)
     pdf = pdfplumber.open(BytesIO(r.content))
-    paper_text, title_related = chatbot.parse_paper(pdf)
-    global df
-    df = chatbot.paper_df(paper_text)
-    df = chatbot.calculate_embeddings(df)
+    paper_text, misc_text, title_related = chatbot.parse_paper(pdf)
+    global df_main, df_misc
+    df_main = chatbot.paper_df(paper_text)
+    df_main = chatbot.calculate_embeddings(df_main)
+    if misc_text != []:
+        df_misc = chatbot.paper_df(misc_text)
+        df_misc = chatbot.calculate_embeddings(df_misc)
     chatbot = Chatbot()
     title_request = chatbot.get_title(title_related)
     global title
@@ -255,7 +322,10 @@ def reply():
     chatbot = Chatbot()
     query = request.json['query']
     query = str(query)
-    messages = chatbot.create_messages(df, query, title)
+    if 'reference' in query or 'references' in query or 'Reference' in query or 'References' in query or 'cite' in query or 'Cite' in query or 'Citation' in query or 'citation' in query or 'Citations' in query or 'citations' in query or 'cite' in query or 'Cite' in query or 'Cited' in query or 'cited' in query or 'Citing' in query or 'citing' in query or 'acknowledgenment' in query or 'acknowledgements' in query or 'Acknowledgenment' in query or 'Acknowledgements' in query  or '参考文献' in query or '致谢' in query: 
+        messages = chatbot.create_messages(df_main, query, title, df_misc)
+    else:
+        messages = chatbot.create_messages(df_main, query, title)
     response = chatbot.gpt(messages)
     print(response)
     return response, 200
