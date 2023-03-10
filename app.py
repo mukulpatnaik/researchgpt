@@ -42,28 +42,28 @@ class Chatbot():
                     if (top <= 260) and (len(text.strip()) > 1): # Header Region, specifically treated for title-realated information
                         title_related.append({
                         'fontsize': fontSize,
-                        'text': text.strip().replace('\x03', ''),
+                        'text': ' ' + text.strip().replace('\x03', ''),
                         'x': x,
                         'y': top
                         })
 
-                    if (top > 260 and bottom < 700) and (len(text.strip()) > 1):
+                    if (top > 260 and bottom < 720) and (len(text.strip()) > 1):
                         sentences.append({
                         'fontsize': fontSize,
-                        'text': text.strip().replace('\x03', ''),
+                        'text': ' ' + text.strip().replace('\x03', ''),
                         'x': x,
                         'y': top
                         })
                 else: # not first page
-                    if (top > 180 and bottom < 700) and (len(text.strip()) > 1):
+                    if (top > 180 and bottom < 720) and (len(text.strip()) > 1):
                         sentences.append({
                         'fontsize': fontSize,
-                        'text': text.strip().replace('\x03', ''),
+                        'text': ' ' + text.strip().replace('\x03', ''),
                         'x': x,
                         'y': top
                         })
             
-            extracted_words = page.extract_words(x_tolerance=3, y_tolerance=3, keep_blank_chars=False, use_text_flow=False, horizontal_ltr=True, vertical_ttb=True, extra_attrs=["fontname", "size"], split_at_punctuation=False)
+            extracted_words = page.extract_words(x_tolerance=3, y_tolerance=3, keep_blank_chars=False, use_text_flow=True, horizontal_ltr=True, vertical_ttb=True, extra_attrs=["fontname", "size"], split_at_punctuation=False)
             
             # Treat the first page differently, specifically targeted at headers
             for extracted_word in extracted_words: 
@@ -71,7 +71,7 @@ class Chatbot():
             
             for j in range(len(sentences)-1):
                 if len(sentences[j]['text']) < 100 and sentences[j]['fontsize'] == sentences[j+1]['fontsize']: # average length of a sentence
-                    sentences[j+1]['text'] = f"{sentences[j]['text']} " + sentences[j+1]['text']
+                    sentences[j+1]['text'] = f"{sentences[j]['text']}" + sentences[j+1]['text']
                 else:
                     page_text.append(sentences[j])
             
@@ -99,7 +99,7 @@ class Chatbot():
             
             for t in range(len(page_text)):
                 if blob_font_size - tolerance <= page_text[t]['fontsize'] <= blob_font_size + tolerance:
-                    blob_text += f" {page_text[t]['text']}"
+                    blob_text += f"{page_text[t]['text']}"
                     if len(blob_text) >= 500: # set the length of a data chunk
                         processed_text.append({
                             'text': blob_text,
