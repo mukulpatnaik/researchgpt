@@ -165,7 +165,7 @@ input.addEventListener("change", async function() {
   var loading = document.createElement("p");
   loading.style.color = "lightgray";
   loading.style.fontSize = "14px";
-  loading.innerHTML = "Calculating embeddings...";
+  loading.innerHTML = "Calculating embeddings... Please send your questions after this message disappears.";
   chat.appendChild(loading);
 
   // Make a post request to /process_pdf with the file
