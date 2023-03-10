@@ -83,19 +83,24 @@ class Chatbot():
                     ismisc = True    
                 visitor_body(extracted_word['text'], isfirstpage, extracted_word['x0'], extracted_word['top'], extracted_word['bottom'], extracted_word['size'], ismisc=ismisc)
             
-            if sentences != []:
-                for j in range(len(sentences)-1):
-                    if len(sentences[j]['text']) < 100 and sentences[j]['fontsize'] == sentences[j+1]['fontsize']: # average length of a sentence
-                        sentences[j+1]['text'] = f"{sentences[j]['text']}" + sentences[j+1]['text']
-                    else:
-                        page_text.append(sentences[j])
+            if sentences != []:          
+                    if len(sentences) == 1:
+                        page_text.append(sentences)
+                    for j in range(len(sentences)-1):
+                        if len(sentences[j]['text']) < 100 and sentences[j]['fontsize'] == sentences[j+1]['fontsize']: # average length of a sentence
+                            sentences[j+1]['text'] = f"{sentences[j]['text']}" + sentences[j+1]['text']
+                        else:
+                            page_text.append(sentences[j])
             
             if ismisc == True:
-                for j in range(len(misc_sentences)-1):
-                    if len(misc_sentences[j]['text']) < 100 and misc_sentences[j]['fontsize'] == misc_sentences[j+1]['fontsize']: # average length of a sentence
-                        misc_sentences[j+1]['text'] = f"{misc_sentences[j]['text']}" + misc_sentences[j+1]['text']
+                    if len(misc_sentences) == 1:
+                        misc_page_text.append(misc_sentences)
                     else:
-                        misc_page_text.append(misc_sentences[j])
+                        for j in range(len(misc_sentences)-1):
+                            if len(misc_sentences[j]['text']) < 100 and misc_sentences[j]['fontsize'] == misc_sentences[j+1]['fontsize']: # average length of a sentence
+                                misc_sentences[j+1]['text'] = f"{misc_sentences[j]['text']}" + misc_sentences[j+1]['text']
+                            else:
+                                misc_page_text.append(misc_sentences[j])
             
             blob_font_sizes = []
             blob_font_size = None
@@ -106,7 +111,7 @@ class Chatbot():
                 misc_blob_font_size = None
                 misc_blob_text = ''
                 misc_processed_text = []
-            tolerance = 0.5
+            tolerance = 1
             
             # Preprocessing for title font size
             if isfirstpage:
@@ -123,57 +128,83 @@ class Chatbot():
             
             # Preprocessing for main text font size
             if page_text != []:
-                for t in page_text:
-                    blob_font_sizes.append(t['fontsize'])
+                if len(page_text) == 1:
+                    blob_font_sizes.append(page_text[0][0]['fontsize'])
+                else:
+                    for t in page_text:
+                        blob_font_sizes.append(t['fontsize'])
                 blob_font_size = Counter(blob_font_sizes).most_common(1)[0][0]
             
             if ismisc == True:
             # Preprocessing for misc text font size
-                for s in misc_page_text:
-                    misc_blob_font_sizes.append(s['fontsize'])
+                if len(misc_page_text) == 1:
+                    misc_blob_font_sizes.append(misc_page_text[0][0]['fontsize'])
+                else:
+                    for s in misc_page_text:
+                        misc_blob_font_sizes.append(s['fontsize'])
                 misc_blob_font_size = Counter(misc_blob_font_sizes).most_common(1)[0][0]
             
             if page_text != []:
-                for t in range(len(page_text)):
-                    if blob_font_size - tolerance <= page_text[t]['fontsize'] <= blob_font_size + tolerance:
-                        blob_text += f"{page_text[t]['text']}"
-                        if len(blob_text) >= 500: # set the length of a data chunk
-                            processed_text.append({
-                                'text': blob_text,
+                if len(page_text) == 1:
+                    if blob_font_size - tolerance <= page_text[0][0]['fontsize'] <= blob_font_size + tolerance:
+                        processed_text.append({
+                                'text': page_text[0][0]['text'],
                                 'page': i+1
                             })
-                            blob_text = ''
-                        elif t == len(page_text)-1: # last element
-                            processed_text.append({
-                                'text': blob_text,
-                                'page': i+1
-                            })
+                else:
+                    for t in range(len(page_text)):
+                        if blob_font_size - tolerance <= page_text[t]['fontsize'] <= blob_font_size + tolerance:
+                            blob_text += f"{page_text[t]['text']}"
+                            if len(blob_text) >= 500: # set the length of a data chunk
+                                processed_text.append({
+                                    'text': blob_text,
+                                    'page': i+1
+                                })
+                                blob_text = ''
+                            elif t == len(page_text)-1: # last element
+                                processed_text.append({
+                                    'text': blob_text,
+                                    'page': i+1
+                                })
                 paper_text += processed_text
             
             if ismisc == True:
-                for s in range(len(misc_page_text)):
-                    if misc_blob_font_size - tolerance <= misc_page_text[s]['fontsize'] <= misc_blob_font_size + tolerance:
-                        misc_blob_text += f"{misc_page_text[s]['text']}"
-                        if len(misc_blob_text) >= 500: # set the length of a data chunk
-                            misc_processed_text.append({
-                                'text': misc_blob_text,
+                if len(misc_page_text) == 1:
+                    if misc_blob_font_size - tolerance <= misc_page_text[0][0]['fontsize'] <= misc_blob_font_size + tolerance:
+                        misc_processed_text.append({
+                                'text': misc_page_text[0][0]['text'],
                                 'page': i+1
                             })
-                            misc_blob_text = ''
-                        elif s == len(misc_page_text)-1: # last element
-                            misc_processed_text.append({
-                                'text': misc_blob_text,
-                                'page': i+1
-                            })
+                else:
+                    for s in range(len(misc_page_text)):
+                        if misc_blob_font_size - tolerance <= misc_page_text[s]['fontsize'] <= misc_blob_font_size + tolerance:
+                            misc_blob_text += f"{misc_page_text[s]['text']}"
+                            if len(misc_blob_text) >= 500: # set the length of a data chunk
+                                misc_processed_text.append({
+                                    'text': misc_blob_text,
+                                    'page': i+1
+                                })
+                                misc_blob_text = ''
+                            elif s == len(misc_page_text)-1: # last element
+                                misc_processed_text.append({
+                                    'text': misc_blob_text,
+                                    'page': i+1
+                                })
                 misc_text += misc_processed_text
         print("Done parsing paper")
         
         # title judgement
         if len(title_clean) != 1:
-            for i in range(3): # try 3 times
-                if len(title_clean[i]) > 30:
-                    title_sentence = title_clean[i]
-                    break
+            if len(title_clean) <= 3:
+                for title in title_clean:
+                    if len(title) > 30:
+                        title_sentence = title
+                        break
+            else:
+                for i in range(3): # try 3 times
+                    if len(title_clean[i]) > 30:
+                        title_sentence = title_clean[i]
+                        break
         return paper_text, misc_text, title_sentence
 
     def paper_df(self, pdf):

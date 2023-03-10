@@ -59,7 +59,7 @@ az webapp up --runtime PYTHON:3.9 --sku B1 --logs
 ```
 
 ## Limitations
-Due to the PDF to text conversion and embedding construction technique, the web app is limited to handle detailed query. Comparing to the original version, this version has specifically targeted at this problem and making improvements. We are continuing working on improving the app to give better respond.
+Due to the PDF to text conversion and embedding construction technique, the web app is limited to handle detailed query. Also, when a paper has distinguished pattern from the ordinary paper, this application also may not able to handle it. Comparing to the original version, this version has specifically targeted at this problem and making improvements. We are continuing working on improving the app to give better respond. At this time, you are encouraged to try this app on papers less than 20 pages and give us feedback.
 
 
 The improved results can be seen as follows (Click for full-sized image):

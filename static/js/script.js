@@ -80,7 +80,7 @@ send.addEventListener("click", function(event) {
       errorMessage.style.color = "red";
       errorMessage.style.marginBottom = "0px";
       errorMessage.style.paddingTop = "0px";
-      errorMessage.innerHTML = "Error: Request to OpenAI failed. Please try again.";
+      errorMessage.innerHTML = "Error: Either requesting to OpenAI failed or this PDF does not support by this software. Please try again or change your document.";
       chat.appendChild(errorMessage);
       chat.scrollTop = chat.scrollHeight;
     });
