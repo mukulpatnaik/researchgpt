@@ -44,7 +44,7 @@ class Chatbot():
             def visitor_body(text, isfirstpage, x, top, bottom, fontSize, ismisc):
                 # ignore header/footer
                 if isfirstpage:
-                    if (top <= 300) and (len(text.strip()) > 1): # Header Region, specifically treated for title-realated information
+                    if (top <= 200) and (len(text.strip()) > 1): # Header Region, specifically treated for title-realated information
                         title_related.append({
                         'fontsize': fontSize,
                         'text': ' ' + text.strip().replace('\x03', ''),
@@ -52,7 +52,7 @@ class Chatbot():
                         'y': top
                         })
 
-                    if (top > 300 and bottom < 720) and (len(text.strip()) > 1):
+                    if (top > 200 and bottom < 720) and (len(text.strip()) > 1):
                         sentences.append({
                         'fontsize': fontSize,
                         'text': ' ' + text.strip().replace('\x03', ''),
@@ -263,12 +263,17 @@ class Chatbot():
     
     def create_messages(self, df, user_input, title, *df_misc):
         if df_misc == None:
-            result = self.search_embeddings(df, user_input, n=int(math.log2(number_of_pages)))
-            print(result)
+            result_df = df
         else:
-            df = df.append(df_misc)
-            result = self.search_embeddings(df, user_input, n=int(math.log2(number_of_pages)))
-            print(result)
+            result_df = df.append(df_misc)
+        
+        if number_of_pages >= 8:
+            result = self.search_embeddings(result_df, user_input, n=int(math.log2(number_of_pages)))
+        else:
+            if len(df) < 3:
+                result = self.search_embeddings(result_df, user_input, n=len(df))
+            else:
+                result = self.search_embeddings(result_df, user_input, n=3)
             
         total_max_string = 2000
         max_string = total_max_string // int(math.log2(number_of_pages))
