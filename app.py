@@ -75,7 +75,7 @@ class Chatbot():
                             'y': top
                             })
                         
-            extracted_words = page.extract_words(x_tolerance=3, y_tolerance=3, keep_blank_chars=False, use_text_flow=True, horizontal_ltr=True, vertical_ttb=True, extra_attrs=["fontname", "size"], split_at_punctuation=False)
+            extracted_words = page.extract_words(x_tolerance=1, y_tolerance=3, keep_blank_chars=False, use_text_flow=True, horizontal_ltr=True, vertical_ttb=True, extra_attrs=["fontname", "size"], split_at_punctuation=False)
             
             # Treat the first page, main text, and references differently, specifically targeted at headers
             for extracted_word in extracted_words: 
