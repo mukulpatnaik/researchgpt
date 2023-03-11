@@ -1,57 +1,32 @@
-# essentials
+# Essentials to use this frontend
 
 ## Project setup
 
 ```
-# yarn
 yarn
-
-# npm
-npm install
-
-# pnpm
-pnpm install
-```
-
-### Compiles and hot-reloads for development
-
-```
-# yarn
-yarn dev
-
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
 ```
 
 ### Compiles and minifies for production
 
 ```
-# yarn
 yarn build
-
-# npm
-npm run build
-
-# pnpm
-pnpm build
 ```
 
-### Lints and fixes files
+Then `dist` folder should appear in `./frontend`. Go back to root dir of this project, then
 
 ```
-# yarn
-yarn lint
-
-# npm
-npm run lint
-
-# pnpm
-pnpm lint
+python app.py
 ```
 
-### Customize configuration
+Here you go!
 
-See [Configuration Reference](https://vitejs.dev/config/).
+
+## Development of the frontend
+
+Compiles and hot-reloads for development,
+
+```
+yarn dev
+```
+
+The reverse proxy of development server is already set in `vite.config.js`. If not work, modify it. 
