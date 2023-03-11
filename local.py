@@ -129,7 +129,7 @@ class Chatbot():
             # Preprocessing for main text font size
             if page_text != []:
                 if len(page_text) == 1:
-                    blob_font_sizes.append(page_text[0][0]['fontsize'])
+                    blob_font_sizes.append(page_text[0]['fontsize'])
                 else:
                     for t in page_text:
                         blob_font_sizes.append(t['fontsize'])
@@ -138,7 +138,7 @@ class Chatbot():
             if ismisc == True:
             # Preprocessing for misc text font size
                 if len(misc_page_text) == 1:
-                    misc_blob_font_sizes.append(misc_page_text[0][0]['fontsize'])
+                    misc_blob_font_sizes.append(misc_page_text[0]['fontsize'])
                 else:
                     for s in misc_page_text:
                         misc_blob_font_sizes.append(s['fontsize'])
@@ -146,9 +146,9 @@ class Chatbot():
             
             if page_text != []:
                 if len(page_text) == 1:
-                    if blob_font_size - tolerance <= page_text[0][0]['fontsize'] <= blob_font_size + tolerance:
+                    if blob_font_size - tolerance <= page_text[0]['fontsize'] <= blob_font_size + tolerance:
                         processed_text.append({
-                                'text': page_text[0][0]['text'],
+                                'text': page_text[0]['text'],
                                 'page': i+1
                             })
                 else:
@@ -170,9 +170,9 @@ class Chatbot():
             
             if ismisc == True:
                 if len(misc_page_text) == 1:
-                    if misc_blob_font_size - tolerance <= misc_page_text[0][0]['fontsize'] <= misc_blob_font_size + tolerance:
+                    if misc_blob_font_size - tolerance <= misc_page_text[0]['fontsize'] <= misc_blob_font_size + tolerance:
                         misc_processed_text.append({
-                                'text': misc_page_text[0][0]['text'],
+                                'text': misc_page_text[0]['text'],
                                 'page': i+1
                             })
                 else:
