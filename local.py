@@ -112,6 +112,7 @@ class Chatbot():
                 misc_blob_text = ''
                 misc_processed_text = []
             tolerance = 1
+            title_tolerance = 3.6
             
             # Preprocessing for title font size
             if isfirstpage:
@@ -121,7 +122,7 @@ class Chatbot():
                     title_font_sizes.append(q['fontsize'])
                 title_font_size = max(title_font_sizes) # title is the largest font size
                 for r in title_related:
-                    if title_font_size - tolerance <= r['fontsize'] <= title_font_size + tolerance:
+                    if title_font_size - title_tolerance <= r['fontsize'] <= title_font_size:
                         title_clean.append(r['text'])
                 
                 title_sentence = ' '.join(title_clean)
@@ -383,7 +384,7 @@ def reply():
     chatbot = Chatbot()
     query = request.json['query']
     query = str(query)
-    if 'reference' in query or 'references' in query or 'Reference' in query or 'References' in query or 'cite' in query or 'Cite' in query or 'Citation' in query or 'citation' in query or 'Citations' in query or 'citations' in query or 'cite' in query or 'Cite' in query or 'Cited' in query or 'cited' in query or 'Citing' in query or 'citing' in query or 'acknowledgenment' in query or 'acknowledgements' in query or 'Acknowledgenment' in query or 'Acknowledgements' in query  or '参考文献' in query or '致谢' in query: 
+    if 'reference' in query or 'references' in query or 'Reference' in query or 'References' in query or 'cite' in query or 'Cite' in query or 'Citation' in query or 'citation' in query or 'Citations' in query or 'citations' in query or 'cite' in query or 'Cite' in query or 'Cited' in query or 'cited' in query or 'Citing' in query or 'citing' in query or 'acknowledgenment' in query or 'acknowledgements' in query or 'Acknowledgenment' in query or 'Acknowledgements' in query or 'appendix' in query or 'Appendix' in query or 'appendices' in query or 'Appendices' in query  or '参考文献' in query or '致谢' in query or '附录' in query: 
         messages = chatbot.create_messages(df_main, query, title, df_misc)
     else:
         messages = chatbot.create_messages(df_main, query, title)
