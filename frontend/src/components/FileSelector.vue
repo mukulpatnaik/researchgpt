@@ -16,10 +16,9 @@
                   label="Select Local File"></v-file-input>
               </v-col>
               <v-col cols="12">
-                <v-alert density="compact" variant="outlined" type="info" prominent closable border="top">
-                  <strong>Note:</strong> This is a demo app.
-                  All files are not stored on the server. When using online PDF, 
-                  you must enter a complete URL with .pdf suffix.
+                <v-alert density="compact" variant="outlined" type="info" closable>
+                  <strong>Note:</strong> This is a demo app. <br>
+                  No selected files are stored on this server.
                 </v-alert>
               </v-col>
             </v-row>
@@ -56,11 +55,11 @@ const checkInput = (v1, v2) => (!!v1 || !!v2) && (!v1 || !v2)
 const fileURLRule = [v => checkInput(v, fileBlobList.value.length) || "Either input a URL or upload a file.", v => !v || v.endsWith('.pdf') || 'You must enter a complete link with .pdf suffix.']
 const fileBlobListRule = [v => checkInput(v.length, fileURL.value) || "Either input a URL or upload a file."]
 
-const handleClickSubmit = async (e) => {  
+const handleClickSubmit = async (e) => {
   const { valid } = await fileForm.value.validate()
   if (!valid)
-  return
-  
+    return
+
   submitLock.value = true
   if (fileBlobList.value.length) {
     const fileBlob = fileBlobList.value[0];

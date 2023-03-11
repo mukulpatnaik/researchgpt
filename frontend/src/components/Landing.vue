@@ -1,15 +1,16 @@
 <template>
   <v-container class="fill-height">
     <v-responsive class="d-flex align-center text-center fill-height">
-      <v-img contain height="100" src="@/assets/logo.svg" />
+      <v-icon role="img" size="200">
+        mdi-book-open-page-variant
+      </v-icon>
+      <!-- <v-img contain height="100" src="@/assets/logo.svg" /> -->
 
       <div class="text-body-2 font-weight-light mb-n1">Welcome to</div>
 
-      <h1 class="text-h2 font-weight-bold">Research GPT</h1>
+      <h1 class="text-h2 font-weight-bold">ResearchGPT</h1>
 
-      <div class="text-body-2 ma-4">Research GPT employs OpenAI's cutting-edge technology to empower your research.</div>
-
-      <div class="py-5" />
+      <div class="text-body-2 mt-4 mb-6">ResearchGPT employs OpenAI's cutting-edge technology to empower your research.</div>
 
       <v-row class="d-flex align-center justify-center">
         <v-col cols="auto">

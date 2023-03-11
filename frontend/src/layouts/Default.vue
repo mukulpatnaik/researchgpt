@@ -3,9 +3,9 @@
     <v-app-bar color="primary">
       <v-app-bar-title>
         <v-icon icon="mdi-book-open-page-variant" />
-        Research GPT
+        ResearchGPT
       </v-app-bar-title>
-      <v-btn icon>
+      <!-- <v-btn icon>
         <v-icon icon="mdi-dots-vertical" />
         <v-menu activator="parent">
           <v-list @click:select="handleClickMenu">
@@ -14,7 +14,7 @@
             </v-list-item>
           </v-list>
         </v-menu>
-      </v-btn>
+      </v-btn> -->
     </v-app-bar>
     <v-main>
       <router-view />
