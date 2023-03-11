@@ -252,7 +252,7 @@ class Chatbot():
     def get_title(self, title_related):
         system_role = f"""I have a list contains a title of a paper. I want to extract the title of the paper."""
         
-        user_content = f"""Given the string: "{str(title_related)}". Return the title of the paper. Return the title only. Do not return any additional text."""
+        user_content = f"""Given the string of a title and its related information: "{str(title_related)}". Return the title of the paper. Return the title only. Do not return any additional text."""
         
         messages = [
         {"role": "system", "content": system_role},
