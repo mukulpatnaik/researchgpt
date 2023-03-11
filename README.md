@@ -2,6 +2,8 @@
 
 ![banner](images/banner.png)
 
+![https://img.shields.io/github/stars/MrPeterJin/researchgpt?style=for-the-badge](https://img.shields.io/github/stars/MrPeterJin/researchgpt?style=for-the-badge)
+
 This is a fork of the original [ResearchGPT](https://github.com/mukulpatnaik/researchgpt). The current version modifies several settings from the original:
 - Use `GPT-3.5-turbo` instead of `GPT-3`.
 - Add Chinese language support.
