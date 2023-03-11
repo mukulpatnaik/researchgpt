@@ -1,7 +1,7 @@
 <template>
   <v-container class="ma-0 pa-0 fill-height flex-column flex-nowrap">
     <v-container class="pa-2 h-0 flex-grow-1 overflow-y-auto">
-      <MessageLine v-for="msg in msgHistory" :id="msg.id" :left="msg.left" :text="msg.text"></MessageLine>
+      <MessageLine v-for="msg in msgHistory" :id="msg.id" :left="msg.left" :text="msg.text" :sources="msg.sources"></MessageLine>
     </v-container>
     <v-divider></v-divider>
     <v-card :disabled="props.disableChat" style="height: 200px" elevation="4" color="surface" class="w-100" rounded="0">
@@ -53,6 +53,7 @@ const initializeHistory = () => {
     id: 0,
     left: true,
     text: "Hi! What can I do for you today😋?",
+    sources: null,
   }]
 }
 
@@ -68,17 +69,20 @@ const handleClickSend = async () => {
     left: false,
     text: msgToSend.value,
   })
-
+  
+  const msg = msgToSend.value
   msgToSend.value = ""
+
   try {
     sendLock.value = true
-    const reply = await GetChatReply(msgToSend.value)
+    const reply = await GetChatReply(msg)
     console.log(reply)
 
     msgHistory.value.push({
       id: msgHistory.value.length,
       left: true,
-      text: reply["answer"]
+      text: reply["answer"],
+      sources: reply["sources"]
     })
   } catch (e) {
     console.log(e)
