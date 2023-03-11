@@ -317,7 +317,9 @@ def process_pdf():
     global identifier
     identifier = meta['CreationDate']
     paper_text, misc_text, title_related = chatbot.parse_paper(pdf)
+    global df_main, df_misc
     if os.path.exists(f'./embedding/{identifier}_main.pkl'):
+        print("Loading from pickle")
         df_main = pd.read_pickle(f'./embedding/{identifier}_main.pkl')
     else:
         df_main = chatbot.paper_df(paper_text)
@@ -350,6 +352,7 @@ def download_pdf():
     paper_text, misc_text, title_related = chatbot.parse_paper(pdf)
     global df_main, df_misc
     if os.path.exists(f'./embedding/{identifier}_main.pkl'):
+        print("Loading from pickle")
         df_main = pd.read_pickle(f'./embedding/{identifier}_main.pkl')
     else:
         df_main = chatbot.paper_df(paper_text)
