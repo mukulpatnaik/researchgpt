@@ -38,7 +38,7 @@
 <script setup>
 import MessageLine from "./MessageLine.vue"
 import { ref } from "vue"
-import { GetChatReply } from "@/api/index"
+import { PostChatReply } from "@/api/index"
 
 const emits = defineEmits(["onChangeFile"])
 const props = defineProps({ disableChat: Boolean })
@@ -75,7 +75,7 @@ const handleClickSend = async () => {
 
   try {
     sendLock.value = true
-    const reply = await GetChatReply(msg)
+    const reply = await PostChatReply(msg)
     console.log(reply)
 
     msgHistory.value.push({

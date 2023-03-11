@@ -11,10 +11,10 @@ from collections import Counter
 from flask_cors import CORS
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
+access_key = os.getenv("RESEARCHGPT_AK")
 
 app = Flask(__name__, template_folder="./frontend/dist", static_folder="./frontend/dist/assets")
 CORS(app)
-
 
 class Chatbot():
     
@@ -302,9 +302,15 @@ class Chatbot():
         else:
             response = {'answer': answer.replace("\n", "")}
         return response
+    
+@app.route("/api/auth", methods=['POST'])
+def auth():
+    return {}, 200 if request.args.get("ak") == access_key else 401
 
 @app.route("/api/process_pdf", methods=['POST'])
 def process_pdf():
+    if access_key != request.args.get("ak"):
+        return {}, 401
     print("Processing pdf")
     file = request.data
     pdf = pdfplumber.open(BytesIO(file))
@@ -325,6 +331,8 @@ def process_pdf():
 
 @app.route("/api/download_pdf", methods=['POST'])
 def download_pdf():
+    if access_key != request.args.get("ak"):
+        return {}, 401
     chatbot = Chatbot()
     url = request.json['url']
     r = requests.get(str(url))
@@ -346,6 +354,8 @@ def download_pdf():
 
 @app.route("/api/reply", methods=['POST'])
 def reply():
+    if access_key != request.args.get("ak"):
+        return {}, 401
     chatbot = Chatbot()
     query = request.json['query']
     query = str(query)
