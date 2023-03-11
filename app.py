@@ -12,7 +12,7 @@ from flask_cors import CORS
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="./frontend/dist", static_folder="./frontend/dist/assets")
 CORS(app)
 
 
@@ -303,11 +303,11 @@ class Chatbot():
             response = {'answer': answer.replace("\n", "")}
         return response
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET"])
 def index():
     return render_template("index.html")
 
-@app.route("/process_pdf", methods=['POST'])
+@app.route("/api/process_pdf", methods=['POST'])
 def process_pdf():
     print("Processing pdf")
     file = request.data
@@ -327,7 +327,7 @@ def process_pdf():
     print("Done processing pdf")
     return {'key': ''}
 
-@app.route("/download_pdf", methods=['POST'])
+@app.route("/api/download_pdf", methods=['POST'])
 def download_pdf():
     chatbot = Chatbot()
     url = request.json['url']
@@ -348,7 +348,7 @@ def download_pdf():
     print("Done processing pdf")
     return {'key': ''}
 
-@app.route("/reply", methods=['POST'])
+@app.route("/api/reply", methods=['POST'])
 def reply():
     chatbot = Chatbot()
     query = request.json['query']
