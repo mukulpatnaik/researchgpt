@@ -12,9 +12,8 @@ from flask_cors import CORS
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="./frontend/dist", static_folder="./frontend/dist/assets")
 CORS(app)
-
 
 class Chatbot():
     
@@ -240,7 +239,7 @@ class Chatbot():
         
         results = df.sort_values("similarity", ascending=False, ignore_index=True)
         # make a dictionary of the the first three results with the page number as the key and the text as the value. The page number is a column in the dataframe.
-        results = results.head(n)
+        results = results.head(n).sort_values(by='page')
         global sources 
         sources = []
         for i in range(n):
@@ -308,18 +307,19 @@ class Chatbot():
         else:
             response = {'answer': answer.replace("\n", "")}
         return response
+    
+@app.route("/api/auth", methods=['POST'])
+def auth():
+    return {}, 200
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    return render_template("index.html")
-
-@app.route("/process_pdf", methods=['POST'])
+@app.route("/api/process_pdf", methods=['POST'])
 def process_pdf():
-    chatbot = Chatbot()
     print("Processing pdf")
     file = request.data
     pdf = pdfplumber.open(BytesIO(file))
     meta = pdf.metadata
+    chatbot = Chatbot()
+    paper_text, misc_text, title_related = chatbot.parse_paper(pdf)
     global identifier
     identifier = meta['CreationDate']
     paper_text, misc_text, title_related = chatbot.parse_paper(pdf)
@@ -345,7 +345,7 @@ def process_pdf():
     print("Done processing pdf")
     return {'key': ''}
 
-@app.route("/download_pdf", methods=['POST'])
+@app.route("/api/download_pdf", methods=['POST'])
 def download_pdf():
     chatbot = Chatbot()
     url = request.json['url']
@@ -353,6 +353,7 @@ def download_pdf():
     print(r.headers)
     pdf = pdfplumber.open(BytesIO(r.content))
     meta = pdf.metadata
+    paper_text, misc_text, title_related = chatbot.parse_paper(pdf)
     global identifier
     identifier = meta['CreationDate']
     paper_text, misc_text, title_related = chatbot.parse_paper(pdf)
@@ -365,21 +366,20 @@ def download_pdf():
         df_main = chatbot.calculate_embeddings(df_main)
         df_main.to_pickle(f'./embedding/{identifier}_main.pkl')
         
-    if os.path.exists(f'./embedding/{identifier}_misc.pkl'):
+    if os.path.exists(f'./{identifier}_misc.pkl'):
         df_misc = pd.read_pickle(f'./embedding/{identifier}_misc.pkl')
     else:
         if misc_text != []:
             df_misc = chatbot.paper_df(misc_text)
             df_misc = chatbot.calculate_embeddings(df_misc)
             df_misc.to_pickle(f'./embedding/{identifier}_misc.pkl')
-    chatbot = Chatbot()
     title_request = chatbot.get_title(title_related)
     global title
     title = chatbot.gpt(title_request)
     print("Done processing pdf")
     return {'key': ''}
 
-@app.route("/reply", methods=['POST'])
+@app.route("/api/reply", methods=['POST'])
 def reply():
     chatbot = Chatbot()
     query = request.json['query']
@@ -391,6 +391,11 @@ def reply():
     response = chatbot.gpt(messages)
     print(response)
     return response, 200
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    return render_template('index.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)

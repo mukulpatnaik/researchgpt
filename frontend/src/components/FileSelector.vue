@@ -18,7 +18,8 @@
               <v-col cols="12">
                 <v-alert density="compact" variant="outlined" type="info" closable>
                   <strong>Note:</strong> This is a demo app. <br>
-                  No selected files are stored on this server.
+                  No files are stored on this server. <br>
+                  The uploaded file will be processed in the browser, so please be patient when you upload a file.
                 </v-alert>
               </v-col>
             </v-row>

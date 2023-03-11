@@ -22,22 +22,7 @@
       </v-row>
     </v-responsive>
   </v-container>
-  <v-dialog max-width="40%" v-model="dialog" persistent>
-    <v-card title="Please Provide Invitation Code">
-      <v-card-text>
-        <v-text-field v-model="accessKey" label="Input your invitation code..." required></v-text-field>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="blue-darken-1" variant="text" @click="dialog = false">
-          Close
-        </v-btn>
-        <v-btn color="blue-darken-1" variant="text" @click="handleClickConfirm">
-          Confirm
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+
   <v-snackbar v-model="snackbar">
     {{ snackbarText }}
   </v-snackbar>
@@ -47,33 +32,16 @@
 import { ref } from "vue"
 import { useRouter } from "vue-router";
 
-import { SaveAccessKey, PostAuthed } from "@/api/index"
-
 const dialog = ref(false)
 const snackbar = ref(false)
 const snackbarText = ref("")
-const accessKey = ref("")
 const router = useRouter()
 
 const handleClickSubmit = () => {
-  dialog.value = true
-}
-
-const handleClickConfirm = async () => {
-  try {
-    const resp = await PostAuthed(accessKey.value)
-  } catch (error) {
-    console.log(error)
-    snackbar.value = true
-    snackbarText.value = error.toString()
-    dialog.value = false
-    return
-  }
-
-  SaveAccessKey(accessKey.value)
   dialog.value = false
   router.push({
     name: "Reading"
   })
 }
+
 </script>

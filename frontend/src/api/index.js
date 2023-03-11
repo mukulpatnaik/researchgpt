@@ -1,21 +1,5 @@
-export function SaveAccessKey(ak) {
-  localStorage.setItem("AccessToken", ak);
-}
-
-export function ClearAccessKey() {
-  localStorage.removeItem("AccessToken");
-}
-
-export function LoadAccessKey() {
-  const AccessToken = localStorage.getItem("AccessToken");
-  if (AccessToken == null) {
-    return null;
-  }
-  return AccessToken;
-}
-
 export async function PostDownloadPDF(url) {
-  const resp = await fetch(`/api/download_pdf?ak=${ak}`, {
+  const resp = await fetch(`/api/download_pdf`, {
     method: "POST",
     body: JSON.stringify({ url: url }),
     headers: {
@@ -34,9 +18,8 @@ export async function PostDownloadPDF(url) {
 }
 
 export async function PostProcessPDF(fileBlob) {
-  const ak = LoadAccessKey();
   const fileArrayBuffer = await fileBlob.arrayBuffer();
-  const resp = await fetch(`/api/process_pdf?ak=${ak}`, {
+  const resp = await fetch(`/api/process_pdf`, {
     method: "POST",
     body: fileArrayBuffer,
     headers: {
@@ -56,8 +39,7 @@ export async function PostProcessPDF(fileBlob) {
 }
 
 export async function PostChatReply(message) {
-  const ak = LoadAccessKey();
-  const resp = await fetch(`/api/reply?ak=${ak}`, {
+  const resp = await fetch(`/api/reply`, {
     method: "POST",
     body: JSON.stringify({ query: message, key: window.key }),
     headers: {
@@ -67,28 +49,6 @@ export async function PostChatReply(message) {
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
     },
   });
-
-  if (resp.status != 200) {
-    throw Error("Invaild response from API");
-  }
-
-  return resp.json();
-}
-
-export async function PostAuthed(ak) {
-  const resp = await fetch(`/api/auth?ak=${ak}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    },
-  });
-
-  if (resp.status == 401) {
-    throw Error("Invaild code!");
-  }
 
   if (resp.status != 200) {
     throw Error("Invaild response from API");
