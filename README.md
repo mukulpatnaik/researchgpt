@@ -28,31 +28,23 @@ cd researchgpt
 pip install -r requirements.txt
 ```
 
-Also, you need to have an OpenAI API key and set it as the environment variable 'OPENAI_API_KEY', i.e., `export OPENAI_API_KEY=YOUR_API_KEY`
+Also, you need to have an OpenAI API key and set it as the environment variable 'OPENAI_API_KEY'.
 
 ## Usage
 
 ### Run locally
+The local version would save the pdf embeddings in the `embedding` folder to save OpenAI API usage. You can run the app locally with:
 
 ```bash
 export OPENAI_API_KEY=YOUR_API_KEY
-python app.py
+python local.py
 ```
 
 And then open http://127.0.0.1:8080/ in your browser.
 
-or:
-
-```bash
-export OPENAI_API_KEY=YOUR_API_KEY
-flask run
-```
-
-And then open http://127.0.0.1:5000/ in your browser.
-
 ### Microsoft Azure Deployment
 
-Follow the instructions [here](https://learn.microsoft.com/zh-cn/azure/app-service/quickstart-python?tabs=flask%2Cwindows%2Cazure-cli%2Cvscode-deploy%2Cdeploy-instructions-azportal%2Cterminal-bash%2Cdeploy-instructions-zip-azcli). Once you have the azure cli set up with `az login`, you can deploy with streamed logs:
+The online version does not save any data. Follow the instructions [here](https://learn.microsoft.com/zh-cn/azure/app-service/quickstart-python?tabs=flask%2Cwindows%2Cazure-cli%2Cvscode-deploy%2Cdeploy-instructions-azportal%2Cterminal-bash%2Cdeploy-instructions-zip-azcli). Once you have the azure cli set up with `az login`, you can deploy with streamed logs:
 
 ```bash
 az webapp up --runtime PYTHON:3.9 --sku B1 --logs
