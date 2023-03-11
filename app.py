@@ -11,10 +11,10 @@ from collections import Counter
 from flask_cors import CORS
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
+access_key = os.getenv("RESEARCHGPT_AK")
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="./frontend/dist", static_folder="./frontend/dist/assets")
 CORS(app)
-
 
 class Chatbot():
     
@@ -308,13 +308,15 @@ class Chatbot():
         else:
             response = {'answer': answer.replace("\n", "")}
         return response
+    
+@app.route("/api/auth", methods=['POST'])
+def auth():
+    return {}, 200 if request.args.get("ak") == access_key else 401
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    return render_template("index.html")
-
-@app.route("/process_pdf", methods=['POST'])
+@app.route("/api/process_pdf", methods=['POST'])
 def process_pdf():
+    if access_key != request.args.get("ak"):
+        return {}, 401
     print("Processing pdf")
     file = request.data
     pdf = pdfplumber.open(BytesIO(file))
@@ -333,8 +335,10 @@ def process_pdf():
     print("Done processing pdf")
     return {'key': ''}
 
-@app.route("/download_pdf", methods=['POST'])
+@app.route("/api/download_pdf", methods=['POST'])
 def download_pdf():
+    if access_key != request.args.get("ak"):
+        return {}, 401
     chatbot = Chatbot()
     url = request.json['url']
     r = requests.get(str(url))
@@ -354,8 +358,10 @@ def download_pdf():
     print("Done processing pdf")
     return {'key': ''}
 
-@app.route("/reply", methods=['POST'])
+@app.route("/api/reply", methods=['POST'])
 def reply():
+    if access_key != request.args.get("ak"):
+        return {}, 401
     chatbot = Chatbot()
     query = request.json['query']
     query = str(query)
@@ -366,6 +372,11 @@ def reply():
     response = chatbot.gpt(messages)
     print(response)
     return response, 200
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    return render_template('index.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
