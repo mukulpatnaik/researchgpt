@@ -62,8 +62,6 @@ The improved results can be seen as follows (Click for full-sized image):
 |![header](/images/improved2.png)|![header](/images/orig2.png)|
 |![detail](/images/improved3.png)|![detail](/images/orig3.png)|
 
-
-
-
+[![Star History Chart](https://api.star-history.com/svg?repos=MrPeterJin/researchgpt&type=Date)](https://star-history.com/#MrPeterJin/researchgpt&Date)
 
 
