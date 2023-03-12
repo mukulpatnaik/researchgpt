@@ -10,7 +10,7 @@ This is a fork of the original [ResearchGPT](https://github.com/mukulpatnaik/res
 - Improved results for research papers.
 - Modification of the frontend.
 
-I use this repository to study OpenAI's API, Microsoft's Azure, GitHub Pages, ,CI/CD and Vue.js Frontend Framework. The partial original README is below. 
+I use this repository to study OpenAI's API, Microsoft's Azure, GitHub Pages, CI/CD and Vue.js Frontend Framework. The partial original README is below. 
 
 This is a flask app provides an interface to enable a conversation with a research paper. You can enter a link to a pdf hosted online or upload your own pdf. The app will then extract the text from the pdf, create embeddings from the text and use them with the openai api to generate a response to a question you ask. It will also return a source for the part of the text it used to generate the response and the page number.
 
@@ -24,6 +24,8 @@ This web app supports query in multiple languanges and research papers in Englis
 ![demo](/images/demo.png)
 
 ![demo2](/images/demo2.png)
+
+![demo3](/images/demo3.png)
 
 ## Installation
 
@@ -49,8 +51,6 @@ python local.py
 ```
 
 For convenience, the local version stores the embeddings in the `embedding` folder in order to save the cost and time. 
-
-```bash
 
 And then open http://127.0.0.1:8080/ in your browser.
 
