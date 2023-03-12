@@ -77,10 +77,20 @@ class Chatbot():
             extracted_words = page.extract_words(x_tolerance=1, y_tolerance=3, keep_blank_chars=False, use_text_flow=True, horizontal_ltr=True, vertical_ttb=True, extra_attrs=["fontname", "size"], split_at_punctuation=False)
             
             # Treat the first page, main text, and references differently, specifically targeted at headers
-            for extracted_word in extracted_words: 
-                if 'References' in extracted_word['text'].strip().replace('\x03', '') or 'REFERENCES' in extracted_word['text'].strip().replace('\x03', '') or 'Bibliography' in extracted_word['text'].strip().replace('\x03', '') or 'BIBLIOGRAPHY' in extracted_word['text'].strip().replace('\x03', '') or 'Acknowledgements' in extracted_word['text'].strip().replace('\x03', '') or 'ACKNOWLEDGEMENTS' in extracted_word['text'].strip().replace('\x03', '') or 'Acknowledgments' in extracted_word['text'].strip().replace('\x03', '') or 'ACKNOWLEDGMENTS' in extracted_word['text'].strip().replace('\x03', '') or '参考文献' in extracted_word['text'].strip().replace('\x03', '') or '致谢' in extracted_word['text'].strip().replace('\x03', ''): # ignore references and acknowledgements
-                    ismisc = True    
-                visitor_body(extracted_word['text'], isfirstpage, extracted_word['x0'], extracted_word['top'], extracted_word['bottom'], extracted_word['size'], ismisc=ismisc)
+            # Define a list of keywords to ignore
+            keywords_for_misc = ['References', 'REFERENCES', 'Bibliography', 'BIBLIOGRAPHY', 'Acknowledgements', 'ACKNOWLEDGEMENTS', 'Acknowledgments', 'ACKNOWLEDGMENTS', '参考文献', '致谢']
+
+            # Loop through the extracted words
+            for extracted_word in extracted_words:
+                # Strip the text and remove any special characters
+                text = extracted_word['text'].strip().replace('\x03', '')
+                
+                # Check if the text contains any of the keywords to ignore
+                if any(keyword in text for keyword in keywords_for_misc):
+                    ismisc = True
+                    
+                # Call the visitor_body function with the relevant arguments
+                visitor_body(text, isfirstpage, extracted_word['x0'], extracted_word['top'], extracted_word['bottom'], extracted_word['size'], ismisc=ismisc)
             
             if sentences != []:          
                     if len(sentences) == 1:
@@ -358,10 +368,24 @@ def reply():
     chatbot = Chatbot()
     query = request.json['query']
     query = str(query)
-    if 'reference' in query or 'references' in query or 'Reference' in query or 'References' in query or 'cite' in query or 'Cite' in query or 'Citation' in query or 'citation' in query or 'Citations' in query or 'citations' in query or 'cite' in query or 'Cite' in query or 'Cited' in query or 'cited' in query or 'Citing' in query or 'citing' in query or 'acknowledgenment' in query or 'acknowledgements' in query or 'Acknowledgenment' in query or 'Acknowledgements' in query or 'appendix' in query or 'Appendix' in query or 'appendices' in query or 'Appendices' in query  or '参考文献' in query or '致谢' in query or '附录' in query: 
-        messages = chatbot.create_messages(df_main, query, title, df_misc)
+        # Define a list of keywords to match
+    keywords_to_match = ['reference', 'references', 'cite', 'citation', 'citations', 'cited', 'citing', 'acknowledgment', 'acknowledgements', 'appendix', 'appendices', '参考文献', '致谢', '附录']
+
+    # Check if the query matches any of the keywords and if 'df_misc' is defined
+    if any(keyword in query for keyword in keywords_to_match) and 'df_misc' in globals():
+        # If the query matches and 'df_misc' is defined, create messages with 'df_misc'
+        messages = chatbot.create_messages(df_main, query, title, True, df_misc)
+    elif scope and 'df_misc' in globals():
+        # If 'scope' is True and 'df_misc' is defined, create messages with 'df_misc'
+        messages = chatbot.create_messages(df_main, query, title, True, df_misc)
+    elif scope:
+        # If 'scope' is True but 'df_misc' is not defined, create messages without 'df_misc'
+        messages = chatbot.create_messages(df_main, query, title, True)
     else:
-        messages = chatbot.create_messages(df_main, query, title)
+        # If none of the above conditions are met, create messages without 'df_misc'
+        messages = chatbot.create_messages(df_main, query, title, False)
+
+    # Call the gpt function with the messages and False as arguments
     response = chatbot.gpt(messages)
     print(response)
     return response, 200
