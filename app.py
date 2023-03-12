@@ -374,16 +374,10 @@ def reply():
     # Check if the query matches any of the keywords and if 'df_misc' is defined
     if any(keyword in query for keyword in keywords_to_match) and 'df_misc' in globals():
         # If the query matches and 'df_misc' is defined, create messages with 'df_misc'
-        messages = chatbot.create_messages(df_main, query, title, True, df_misc)
-    elif scope and 'df_misc' in globals():
-        # If 'scope' is True and 'df_misc' is defined, create messages with 'df_misc'
-        messages = chatbot.create_messages(df_main, query, title, True, df_misc)
-    elif scope:
-        # If 'scope' is True but 'df_misc' is not defined, create messages without 'df_misc'
-        messages = chatbot.create_messages(df_main, query, title, True)
+        messages = chatbot.create_messages(df_main, query, title, df_misc)
     else:
         # If none of the above conditions are met, create messages without 'df_misc'
-        messages = chatbot.create_messages(df_main, query, title, False)
+        messages = chatbot.create_messages(df_main, query, title)
 
     # Call the gpt function with the messages and False as arguments
     response = chatbot.gpt(messages)
