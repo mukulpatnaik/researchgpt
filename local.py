@@ -79,14 +79,23 @@ class Chatbot():
             # Treat the first page, main text, and references differently, specifically targeted at headers
                         # Define a list of keywords to ignore
             keywords_for_misc = ['References', 'REFERENCES', 'Bibliography', 'BIBLIOGRAPHY', 'Acknowledgements', 'ACKNOWLEDGEMENTS', 'Acknowledgments', 'ACKNOWLEDGMENTS', '参考文献', '致谢']
-
+            
+            keywords_for_exception = ['R', 'B', 'A']
+            extracted_words = iter(extracted_words)
+            
             # Loop through the extracted words
             for extracted_word in extracted_words:
                 # Strip the text and remove any special characters
                 text = extracted_word['text'].strip().replace('\x03', '')
                 
+                if len(text) == 1 and any(keyword in text for keyword in keywords_for_exception):
+                    try:
+                        tmp_text = text + next(extracted_words)['text']
+                    except StopIteration: 
+                        pass
+                    
                 # Check if the text contains any of the keywords to ignore
-                if any(keyword in text for keyword in keywords_for_misc):
+                if 'tmp_text' in locals() and any(keyword in tmp_text for keyword in keywords_for_misc):
                     ismisc = True
                     
                 # Call the visitor_body function with the relevant arguments
