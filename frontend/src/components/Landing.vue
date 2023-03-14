@@ -44,7 +44,7 @@
               <v-card-text>
                 May not handle very detail queries <br>
                 May occasionally generate incorrect information <br>
-                May not understand content other than the input text <br>
+                May not understand content other than research papers <br>
               </v-card-text>
             </v-card>
           </v-col>
