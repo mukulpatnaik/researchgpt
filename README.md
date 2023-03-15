@@ -28,6 +28,7 @@ This web app supports query in multiple languanges and research papers in Englis
 ![demo3](/images/demo3.png)
 
 ## Installation
+I have tested the installation on Archlinux and Ubuntu 22.04 LTS. It should work out of the box but I cannot guarantee the compatibility on other platforms.
 
 ```bash
 git clone https://github.com/MrPeterJin/researchgpt
