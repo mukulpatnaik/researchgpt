@@ -116,28 +116,34 @@ class Chatbot():
     def create_prompt(self, df, user_input):
         result = self.search(df, user_input, n=3)
         print(result)
-        prompt = """You are a large language model whose expertise is reading and summarizing scientific papers. 
-        You are given a query and a series of text embeddings from a paper in order of their cosine similarity to the query.
-        You must take the given embeddings and return a very detailed summary of the paper that answers the query.
+        system_role = """whose expertise is reading and summarizing scientific papers. You are given a query, 
+        a series of text embeddings and the title from a paper in order of their cosine similarity to the query. 
+        You must take the given embeddings and return a very detailed summary of the paper in the languange of the query: 
             
-            Given the question: """+ user_input + """
+        Here is the question: """+ user_input + """
             
-            and the following embeddings as data: 
+        and here are the embeddings: 
             
             1.""" + str(result.iloc[0]['text']) + """
             2.""" + str(result.iloc[1]['text']) + """
             3.""" + str(result.iloc[2]['text']) + """
 
-            Return a detailed answer based on the paper:"""
+        """
+
+        user_content = f"""Given the question: "{str(user_input)}". Return a detailed answer based on the paper:"""
+
+        messages = [
+        {"role": "system", "content": system_role},
+        {"role": "user", "content": user_content},]
 
         print('Done creating prompt')
-        return prompt
+        return messages
 
-    def gpt(self, prompt):
+    def gpt(self, messages):
         print('Sending request to GPT-3')
         openai.api_key = os.getenv('OPENAI_API_KEY')
-        r = openai.Completion.create(model="text-davinci-003", prompt=prompt, temperature=0.4, max_tokens=1500)
-        answer = r.choices[0]['text']
+        r = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=messages, temperature=0.7, max_tokens=1500)
+        answer = r.choices[0]["message"]["content"]
         print('Done sending request to GPT-3')
         response = {'answer': answer, 'sources': sources}
         return response
