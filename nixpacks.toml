@@ -2,7 +2,7 @@
 nixPkgs = ['yarn', 'python']
 
 [phases.build]
-cmds = ['cd frontend && yarn && yarn build']
+cmds = ['cd frontend', 'yarn', 'yarn build']
 
 [start]
 cmd = 'flask run'

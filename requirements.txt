@@ -1,4 +1,5 @@
 flask
+virtualenv
 pdfplumber
 pandas
 openai
