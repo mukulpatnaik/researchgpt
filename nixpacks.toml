@@ -1,8 +1,0 @@
-[phases.setup]
-aptPkgs = ['yarnpkg', 'python3.9']
-
-[phases.build]
-cmds = ['cd ./frontend && yarn && yarn build']
-
-[start]
-cmd = 'flask run'

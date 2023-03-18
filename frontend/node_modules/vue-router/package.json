@@ -1,0 +1,114 @@
+{
+  "name": "vue-router",
+  "version": "4.1.6",
+  "main": "index.js",
+  "unpkg": "dist/vue-router.global.js",
+  "jsdelivr": "dist/vue-router.global.js",
+  "module": "dist/vue-router.mjs",
+  "types": "dist/vue-router.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/vue-router.d.ts",
+      "node": {
+        "import": {
+          "production": "./dist/vue-router.node.mjs",
+          "development": "./dist/vue-router.node.mjs",
+          "default": "./dist/vue-router.node.mjs"
+        },
+        "require": {
+          "production": "./dist/vue-router.prod.cjs",
+          "development": "./dist/vue-router.cjs",
+          "default": "./index.js"
+        }
+      },
+      "import": "./dist/vue-router.mjs",
+      "require": "./index.js"
+    },
+    "./dist/*": "./dist/*",
+    "./vetur/*": "./vetur/*",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "funding": "https://github.com/sponsors/posva",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vuejs/router.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vuejs/router/issues"
+  },
+  "homepage": "https://github.com/vuejs/router#readme",
+  "files": [
+    "index.js",
+    "dist/*.{js,cjs,mjs}",
+    "dist/vue-router.d.ts",
+    "vetur/tags.json",
+    "vetur/attributes.json",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "vue": "^3.2.0"
+  },
+  "vetur": {
+    "tags": "vetur/tags.json",
+    "attributes": "vetur/attributes.json"
+  },
+  "dependencies": {
+    "@vue/devtools-api": "^6.4.5"
+  },
+  "devDependencies": {
+    "@microsoft/api-extractor": "^7.29.2",
+    "@rollup/plugin-alias": "^3.1.4",
+    "@rollup/plugin-commonjs": "^22.0.2",
+    "@rollup/plugin-node-resolve": "^13.0.5",
+    "@rollup/plugin-replace": "^4.0.0",
+    "@sucrase/jest-plugin": "^2.1.1",
+    "@types/jest": "^27.4.1",
+    "@types/jsdom": "^16.2.13",
+    "@types/nightwatch": "^2.3.12",
+    "@vitejs/plugin-vue": "^2.3.3",
+    "@vue/compiler-sfc": "^3.2.41",
+    "@vue/server-renderer": "^3.2.41",
+    "@vue/test-utils": "^2.2.0",
+    "browserstack-local": "^1.4.5",
+    "chromedriver": "^106.0.1",
+    "connect-history-api-fallback": "^1.6.0",
+    "conventional-changelog-cli": "^2.1.1",
+    "dotenv": "^16.0.3",
+    "faked-promise": "^2.2.2",
+    "geckodriver": "^3.2.0",
+    "jest": "^27.5.1",
+    "jest-mock-warn": "^1.1.0",
+    "nightwatch": "^2.4.1",
+    "nightwatch-helpers": "^1.2.0",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.78.0",
+    "rollup-plugin-analyzer": "^4.0.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.32.1",
+    "typescript": "~4.7.4",
+    "vite": "^3.1.8",
+    "vue": "^3.2.41"
+  },
+  "scripts": {
+    "dev": "jest --watch",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 1",
+    "build": "rimraf dist && rollup -c rollup.config.js",
+    "build:dts": "api-extractor run --local --verbose && tail -n +10 src/globalExtensions.ts >> dist/vue-router.d.ts",
+    "build:playground": "vue-tsc --noEmit && vite build --config playground/vite.config.js",
+    "build:e2e": "vue-tsc --noEmit && vite build --config e2e/vite.config.js",
+    "build:size": "pnpm run build && rollup -c size-checks/rollup.config.js",
+    "dev:e2e": "vite --config e2e/vite.config.js",
+    "test:types": "tsc --build tsconfig.json",
+    "test:dts": "tsc -p ./test-dts/tsconfig.json",
+    "test:unit": "jest --coverage",
+    "test": "pnpm run test:types && pnpm run test:unit && pnpm run build && pnpm run build:dts && pnpm run test:e2e",
+    "test:e2e": "pnpm run test:e2e:headless",
+    "test:e2e:headless": "node e2e/runner.js --env chrome-headless",
+    "test:e2e:native": "node e2e/runner.js --env chrome",
+    "test:e2e:ci": "node e2e/runner.js --env chrome-headless --retries 2",
+    "test:e2e:bs": "node e2e/runner.js --local -e android5 --tag browserstack",
+    "test:e2e:bs-test": "node e2e/runner.js --local --env browserstack.local_chrome --tag browserstack"
+  }
+}

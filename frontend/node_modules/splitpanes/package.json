@@ -1,0 +1,63 @@
+{
+  "name": "splitpanes",
+  "version": "3.1.5",
+  "description": "A Vue.js reliable, simple and touch-ready panes splitter / resizer",
+  "author": "Antoni Andre <antoniandre.web@gmail.com>",
+  "homepage": "https://antoniandre.github.io/splitpanes",
+  "repository": "https://github.com/antoniandre/splitpanes",
+  "license": "MIT",
+  "funding": "https://github.com/sponsors/antoniandre",
+  "main": "./dist/splitpanes.es.js",
+  "unpkg": "dist/splitpanes.umd.js",
+  "jsdelivr": "dist/splitpanes.umd.js",
+  "module": "./dist/splitpanes.es.js",
+  "files": [
+    "dist",
+    "src/components/splitpanes"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/splitpanes.es.js",
+      "require": "./dist/splitpanes.umd.js"
+    },
+    "./package.json": "./package.json",
+    "./dist/*": "./dist/*"
+  },
+  "type": "module",
+  "keywords": [
+    "splitpanes",
+    "split panes",
+    "panes resizer",
+    "vue",
+    "vue3",
+    "vuejs",
+    "ui"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --base /splitpanes/",
+    "build-bundle": "BUNDLE=true vite build && mv ./dist/style.css ./dist/splitpanes.css",
+    "serve": "vite preview --base /splitpanes/"
+  },
+  "devDependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.4",
+    "@vitejs/plugin-vue": "^3.1.2",
+    "@vue/compiler-sfc": "^3.2.41",
+    "autoprefixer": "^10.4.12",
+    "eslint": "^8.0.1",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-n": "^15.0.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-vue": "^9.6.0",
+    "postcss": "^8.4.18",
+    "pug": "^3.0.2",
+    "rollup-plugin-delete": "^2.0.0",
+    "sass": "^1.55.0",
+    "simple-syntax-highlighter": "^2.2.5",
+    "vite": "^3.1.8",
+    "vue": "^3.2.41",
+    "vue-router": "^4.1.6",
+    "wave-ui": "^2.43.2"
+  }
+}

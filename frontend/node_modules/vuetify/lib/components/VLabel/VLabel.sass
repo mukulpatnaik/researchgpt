@@ -1,0 +1,17 @@
+@use '../../styles/settings'
+@use '../../styles/tools'
+@use './variables' as *
+
+.v-label
+  align-items: center
+  display: $label-display
+  font-size: $label-font-size
+  letter-spacing: $label-letter-spacing
+  min-width: 0
+  opacity: var(--v-medium-emphasis-opacity)
+  overflow: hidden
+  text-overflow: ellipsis
+  white-space: nowrap
+
+.v-label--clickable
+  cursor: pointer

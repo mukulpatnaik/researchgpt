@@ -1,0 +1,31 @@
+.v-data-table-footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 0 8px;
+  justify-content: flex-end;
+}
+
+.v-data-table-footer__items-per-page {
+  padding-inline-end: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.v-data-table-footer__items-per-page > span {
+  padding-inline-end: 24px;
+}
+
+.v-data-table-footer__info {
+  display: flex;
+  padding-inline-end: 24px;
+}
+
+.v-data-table-footer__pagination {
+  display: flex;
+  align-items: center;
+}
+
+.v-data-table-footer__page {
+  padding: 0 8px;
+}

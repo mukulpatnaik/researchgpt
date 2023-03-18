@@ -1,0 +1,1 @@
+{"version":3,"file":"index.mjs","names":["VSkeletonLoader"],"sources":["../../../src/components/VSkeletonLoader/index.ts"],"sourcesContent":["import VSkeletonLoader from './VSkeletonLoader'\n\nexport { VSkeletonLoader }\nexport default VSkeletonLoader\n"],"mappings":"OAAOA,eAAe;AAEtB,SAASA,eAAe;AACxB,eAAeA,eAAe"}

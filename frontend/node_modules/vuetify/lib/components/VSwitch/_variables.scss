@@ -1,0 +1,18 @@
+@use '../../styles/settings';
+
+// VSwitch
+$switch-control-input-transition: .15s transform settings.$standard-easing !default;
+$switch-error-background-color: rgb(var(--v-theme-error)) !default;
+$switch-inset-track-border-radius: 14px !default;
+$switch-inset-track-height: 28px !default;
+$switch-inset-track-width: 48px !default;
+$switch-label-margin-inline-start: 10px !default;
+$switch-thumb-elevation: 4 !default;
+$switch-thumb-height: 20px !default;
+$switch-thumb-width: 20px !default;
+$switch-thumb-offset: 2px !default;
+$switch-thumb-radius: 50% !default;
+$switch-track-radius: 8px !default;
+$switch-track-height: 14px !default;
+$switch-track-opacity: .6 !default;
+$switch-track-width: 36px !default;

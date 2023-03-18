@@ -1,0 +1,15 @@
+{
+    "name": "roboto-fontface",
+    "description": "A simple package providing the Roboto fontface.",
+    "version": "0.9.0",
+    "main": [
+        "./css/roboto/roboto-fontface.css"
+    ],
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ]
+}

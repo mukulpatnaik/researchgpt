@@ -1,0 +1,40 @@
+{
+  "name": "vite-plugin-vuetify",
+  "version": "1.0.2",
+  "description": "A Vite plugin for treeshaking Vuetify components and more",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vuetifyjs/vuetify-loader.git"
+  },
+  "scripts": {
+    "build": "tsc --outdir dist",
+    "dev": "yarn run build --watch"
+  },
+  "author": "Kael Watts-Deuchar",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vuetifyjs/vuetify-loader/issues"
+  },
+  "homepage": "https://github.com/vuetifyjs/vuetify-loader/packages/vite-plugin",
+  "dependencies": {
+    "@vuetify/loader-shared": "^1.7.1",
+    "debug": "^4.3.3",
+    "upath": "^2.0.1"
+  },
+  "peerDependencies": {
+    "vite": "^2.7.0 || ^3.0.0 || ^4.0.0",
+    "vuetify": "^3.0.0-beta.4"
+  },
+  "engines": {
+    "node": ">=12"
+  },
+  "files": [
+    "dist/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "a028a4b981c46795dde2e7004427e365452e0c82"
+}

@@ -1,0 +1,1 @@
+{"version":3,"file":"index.mjs","names":["VSpeedDial"],"sources":["../../../src/components/VSpeedDial/index.ts"],"sourcesContent":["import VSpeedDial from './VSpeedDial'\n\nexport { VSpeedDial }\nexport default VSpeedDial\n"],"mappings":"OAAOA,UAAU;AAEjB,SAASA,UAAU;AACnB,eAAeA,UAAU"}

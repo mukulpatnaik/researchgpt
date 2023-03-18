@@ -1,0 +1,1 @@
+{"version":3,"file":"index.mjs","names":["VData"],"sources":["../../../src/components/VData/index.ts"],"sourcesContent":["import VData from './VData'\n\nexport { VData }\n\nexport default VData\n"],"mappings":"OAAOA,KAAK;AAEZ,SAASA,KAAK;AAEd,eAAeA,KAAK"}
