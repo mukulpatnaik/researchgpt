@@ -1,0 +1,8 @@
+[phases.setup]
+nixPkgs = ['yarn']
+
+[phases.build]
+cmds = ['cd frontend && yarn && yarn build']
+
+[start]
+cmd = 'pip install -r requirements.txt && flask run'
