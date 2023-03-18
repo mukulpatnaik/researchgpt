@@ -2,7 +2,7 @@
 
 ![banner](images/banner.png)
 
-![https://img.shields.io/github/stars/MrPeterJin/researchgpt?style=for-the-badge](https://img.shields.io/github/stars/MrPeterJin/researchgpt?style=for-the-badge)
+![https://img.shields.io/github/stars/MrPeterJin/researchgpt?style=for-the-badge](https://img.shields.io/github/stars/MrPeterJin/researchgpt?style=for-the-badge) <a href="https://www.buymeacoffee.com/MakotoJin" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="28" width="134"></a>
 
 This is a fork of the original [ResearchGPT](https://github.com/mukulpatnaik/researchgpt). The current version modifies several settings from the original:
 - Use `GPT-3.5-turbo` instead of `GPT-3`.
@@ -64,8 +64,15 @@ az webapp up --runtime PYTHON:3.9 --sku B1 --logs
 ```
 The Microsoft Azure's services would identify `app.py` as the entry point of the app. 
 
+### Railway Deployment
+Click the button below and input your OpenAI API key to deploy the app on Railway. Railway is a free hosting platform for web apps. 
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/Qm0r-x?referralCode=sNwXpV)
+
 ## Limitations
 Due to the PDF to text conversion and embedding construction technique, the web app is limited to handle detailed query. Also, when a paper has distinguished pattern from the ordinary paper, this application also may not able to handle it. Furthermore, this app can only read *research* papers, which means that other PDF documents (i.e., books, recipts, ppt converted files) are not in the scope of the capability. Comparing to the original version, this version has specifically targeted at this problem and making improvements. We are continuing working on improving the app to give better respond. At this time, you are encouraged to try this app on papers less than 20 pages and give us feedback. The app does not have the limit in page number, though.
+
+Also, current version of the app is not able to handle the query with simutanous requests, i.e., the web page cannot serve two or more people at the same time. This is out of the scope of my knowledge and I am looking for help.
 
 [![Star History Chart](https://api.star-history.com/svg?repos=MrPeterJin/researchgpt&type=Date)](https://star-history.com/#MrPeterJin/researchgpt&Date)
 
