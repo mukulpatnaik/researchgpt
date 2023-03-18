@@ -79,7 +79,11 @@ class Chatbot():
             # Treat the first page, main text, and references differently, specifically targeted at headers
             # Define a list of keywords to ignore
             keywords_for_misc = ['References', 'REFERENCES', 'Bibliography', 'BIBLIOGRAPHY', 'Acknowledgements', 'ACKNOWLEDGEMENTS', 'Acknowledgments', 'ACKNOWLEDGMENTS', '参考文献', '致谢']
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> 7cba749 (Tunes prompt, performance update)
             keywords_for_exception = ['R', 'B', 'A']
             extracted_words = iter(extracted_words)
             
@@ -100,7 +104,7 @@ class Chatbot():
                     
                 # Call the visitor_body function with the relevant arguments
                 visitor_body(text, isfirstpage, extracted_word['x0'], extracted_word['top'], extracted_word['bottom'], extracted_word['size'], ismisc=ismisc)
-            
+                        
             if sentences != []:          
                     if len(sentences) == 1:
                         page_text.append(sentences)
@@ -279,14 +283,26 @@ class Chatbot():
         print('Done extracting title')
         return messages
     
+    def get_scope(self, user_input):
+        system_role = f"""You are going to determine if a sentence has a request of requesting detailed information of a research paper. Please note that 'main idea', 'summary', 'abstraction', 'overview' are not detailed information. Also, sentences not containing 'detail' or 'reviewer' are not detailed information and you should return a False value. Return a boolean value only."""
+        
+        user_content = f"""The sentence is: "{str(user_input)}"."""
+        
+        messages = [
+        {"role": "system", "content": system_role},
+        {"role": "user", "content": user_content},]
+        
+        return messages
     
-    def create_messages(self, df, user_input, title, *df_misc):
+    def create_messages(self, df, user_input, title, isdetail, *df_misc):
         if df_misc == None:
             result_df = df
         else:
             result_df = df.append(df_misc)
         
-        if number_of_pages >= 8:
+        if number_of_pages >= 6 and isdetail == True:
+            result = self.search_embeddings(result_df, user_input, n=int(math.log2(number_of_pages)) + 2)
+        elif number_of_pages >= 6:
             result = self.search_embeddings(result_df, user_input, n=int(math.log2(number_of_pages)))
         else:
             if len(df) < 3:
@@ -295,7 +311,10 @@ class Chatbot():
                 result = self.search_embeddings(result_df, user_input, n=3)
             
         total_max_string = 2000
-        max_string = total_max_string // int(math.log2(number_of_pages))
+        if isdetail == True:
+            max_string = total_max_string // (int(math.log2(number_of_pages)) + 2)
+        else:
+            max_string = total_max_string // int(math.log2(number_of_pages))
         
         embeddings = []
         
@@ -305,31 +324,28 @@ class Chatbot():
             else:
                 embeddings.append(str(result.iloc[i]['text']))
             
-        system_role = f"""Act as an academician whose expertise is reading and summarizing scientific papers. You are given a query, a series of text embeddings and the title from a paper in order of their cosine similarity to the query. You must take the given embeddings and return a very detailed summary of the paper in the languange of the query. The embeddings are as follows: {str(embeddings)}. The title of the paper is: {title}"""
+        system_role = f"""As an academician, you are tasked with reading and summarizing a scientific paper. You are given a series of text embeddings and the title of the paper, and your goal is to answer any questions related to the paper using the given embeddings and the title. The embeddings are as follows: {str(embeddings)}. The title of the paper is: {title}. To ensure that your answers are accurate and relevant, you must answer in the language of the question. If you cannot answer your question, you will apologize and directly say you do not have the information."""
         
-        user_content = f"""Given the question: "{str(user_input)}". Return a detailed answer based on the paper:"""
+        user_content = f"""The question is: "{str(user_input)}"."""
         
         messages = [
         {"role": "system", "content": system_role},
-        {"role": "user", "content": user_content},]
+        {"role": "user", "content": user_content},
+        ]
         
         print('Done creating messages')
         return messages
 
-    def gpt(self, messages):
+    def gpt(self, messages, isdetail):
         print('Sending request to GPT-3.5-turbo')
         r = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=messages, temperature=0.7, max_tokens=1500)
         answer = r.choices[0]["message"]["content"]
         print('Done sending request to GPT-3.5-turbo')
+        if isdetail:
+            return {'answer': answer.replace("\n", "")}
         if 'sources' in globals().keys():
-            response = {'answer': answer, 'sources': sources}
-        else:
-            response = {'answer': answer.replace("\n", "")}
-        return response
-    
-@app.route("/api/auth", methods=['POST'])
-def auth():
-    return {}, 200
+            return {'answer': answer, 'sources': sources}
+        return {'answer': answer.replace("\n", "")}
 
 @app.route("/api/process_pdf", methods=['POST'])
 def process_pdf():
@@ -347,7 +363,7 @@ def process_pdf():
     chatbot = Chatbot()
     title_request = chatbot.get_title(title_related)
     global title
-    title = chatbot.gpt(title_request)
+    title = chatbot.gpt(title_request, False)
     print("Done processing pdf")
     return {'key': ''}
 
@@ -368,7 +384,7 @@ def download_pdf():
     chatbot = Chatbot()
     title_request = chatbot.get_title(title_related)
     global title
-    title = chatbot.gpt(title_request)
+    title = chatbot.gpt(title_request, False)
     print("Done processing pdf")
     return {'key': ''}
 
@@ -377,19 +393,35 @@ def reply():
     chatbot = Chatbot()
     query = request.json['query']
     query = str(query)
-        # Define a list of keywords to match
+    scope_request = chatbot.get_scope(query)
+    scope = chatbot.gpt(scope_request, True)
+    
+    if 'true' in scope['answer'] or 'True' in scope['answer'] or 'yes' in scope['answer'] or 'Yes' in scope['answer']:
+        scope = True
+    else:
+        scope = False
+    
+    print('Scope: ', scope)
+     
+    # Define a list of keywords to match
     keywords_to_match = ['reference', 'references', 'cite', 'citation', 'citations', 'cited', 'citing', 'acknowledgment', 'acknowledgements', 'appendix', 'appendices', '参考文献', '致谢', '附录']
 
     # Check if the query matches any of the keywords and if 'df_misc' is defined
     if any(keyword in query for keyword in keywords_to_match) and 'df_misc' in globals():
         # If the query matches and 'df_misc' is defined, create messages with 'df_misc'
-        messages = chatbot.create_messages(df_main, query, title, df_misc)
+        messages = chatbot.create_messages(df_main, query, title, True, df_misc)
+    elif scope and 'df_misc' in globals():
+        # If 'scope' is True and 'df_misc' is defined, create messages with 'df_misc'
+        messages = chatbot.create_messages(df_main, query, title, True, df_misc)
+    elif scope:
+        # If 'scope' is True but 'df_misc' is not defined, create messages without 'df_misc'
+        messages = chatbot.create_messages(df_main, query, title, True)
     else:
         # If none of the above conditions are met, create messages without 'df_misc'
-        messages = chatbot.create_messages(df_main, query, title)
+        messages = chatbot.create_messages(df_main, query, title, False)
 
     # Call the gpt function with the messages and False as arguments
-    response = chatbot.gpt(messages)
+    response = chatbot.gpt(messages, False)
     print(response)
     return response, 200
 
