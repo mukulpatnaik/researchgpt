@@ -5,4 +5,4 @@ nixPkgs = ['yarn']
 cmds = ['cd frontend && yarn && yarn build']
 
 [start]
-cmd = 'pip install -r requirements.txt && flask run'
+cmd = 'flask run'
