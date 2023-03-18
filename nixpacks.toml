@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ['yarn', 'python']
+aptPkgs = ['yarn', 'python']
 
 [phases.build]
 cmds = ['cd frontend', 'yarn', 'yarn build']
