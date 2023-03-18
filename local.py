@@ -41,24 +41,15 @@ class Chatbot():
             misc_processed_text = []
 
             def visitor_body(text, isfirstpage, x, top, bottom, fontSize, ismisc):
-                # ignore header/footer
-                if isfirstpage:
-                    if (top <= 200) and (len(text.strip()) > 1): # Header Region, specifically treated for title-realated information
-                        title_related.append({
-                        'fontsize': fontSize,
-                        'text': ' ' + text.strip().replace('\x03', ''),
-                        'x': x,
-                        'y': top
-                        })
-
-                    if (top > 200 and bottom < 720) and (len(text.strip()) > 1):
+                if isfirstpage: # first page, directly process the text
                         sentences.append({
                         'fontsize': fontSize,
                         'text': ' ' + text.strip().replace('\x03', ''),
                         'x': x,
                         'y': top
                         })
-                else: # not first page
+                        
+                else: # not first page, rule out headers
                     if (top > 70 and bottom < 720) and (len(text.strip()) > 1) and not ismisc: # main text region
                             sentences.append({
                             'fontsize': fontSize,
@@ -136,10 +127,16 @@ class Chatbot():
             if isfirstpage:
                 title_clean = []
                 title_font_sizes = []
-                for q in title_related:
+                for q in page_text:
                     title_font_sizes.append(q['fontsize'])
-                title_font_size = max(title_font_sizes) # title is the largest font size
-                for r in title_related:
+                title_font_sizes.sort()
+                title_font_sizes_max_count = title_font_sizes.count(title_font_sizes[-1])
+                title_font_sizes_second_max_count = title_font_sizes.count(title_font_sizes[-2])
+                if title_font_sizes_max_count > title_font_sizes_second_max_count:
+                    title_font_size = title_font_sizes[-1]
+                else:
+                    title_font_size = title_font_sizes[-2] # title is the word cluster with largest font size in most cases
+                for r in page_text:
                     if title_font_size - title_tolerance <= r['fontsize'] <= title_font_size:
                         title_clean.append(r['text'])
                 
