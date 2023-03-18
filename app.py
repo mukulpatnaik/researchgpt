@@ -79,11 +79,7 @@ class Chatbot():
             # Treat the first page, main text, and references differently, specifically targeted at headers
             # Define a list of keywords to ignore
             keywords_for_misc = ['References', 'REFERENCES', 'Bibliography', 'BIBLIOGRAPHY', 'Acknowledgements', 'ACKNOWLEDGEMENTS', 'Acknowledgments', 'ACKNOWLEDGMENTS', '参考文献', '致谢']
-<<<<<<< HEAD
-            
-=======
 
->>>>>>> 7cba749 (Tunes prompt, performance update)
             keywords_for_exception = ['R', 'B', 'A']
             extracted_words = iter(extracted_words)
             
