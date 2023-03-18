@@ -1,5 +1,5 @@
 [phases.setup]
-aptPkgs = ['yarn', 'python']
+aptPkgs = ['yarn', 'python3.9']
 
 [phases.build]
 cmds = ['cd frontend', 'yarn', 'yarn build']
