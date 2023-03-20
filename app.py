@@ -356,6 +356,7 @@ def process_pdf():
     title_request = chatbot.get_title(title_related)
     global title
     title = chatbot.gpt(title_request, False)
+    title = title['answer']
     print("Done processing pdf")
     return {'key': ''}
 
@@ -377,6 +378,7 @@ def download_pdf():
     title_request = chatbot.get_title(title_related)
     global title
     title = chatbot.gpt(title_request, False)
+    title = title['answer']
     print("Done processing pdf")
     return {'key': ''}
 
