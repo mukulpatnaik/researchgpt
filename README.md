@@ -28,7 +28,9 @@ This web app supports query in multiple languanges and research papers in Englis
 ![demo3](/images/demo3.png)
 
 ## Installation
-I have tested the installation on Archlinux and Ubuntu 22.04 LTS. It should work out of the box but I cannot guarantee the compatibility on other platforms.
+To run this app locally, you need to install the dependencies and build the frontend. For starters, you need to install `python3` and `yarn` by following the instructions [here](https://www.python.org/downloads/) and [here](https://classic.yarnpkg.com/en/docs/install/). The app is tested on Ubuntu and Arch Linux.
+
+You can install the dependencies with:
 
 ```bash
 git clone https://github.com/MrPeterJin/researchgpt
