@@ -9,4 +9,4 @@ matplotlib
 scipy
 plotly
 gunicorn==20.1.0
-scikit-learn==0.24.1
+scikit-learn
