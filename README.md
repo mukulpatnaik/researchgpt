@@ -10,7 +10,7 @@ This is a fork of the original [ResearchGPT](https://github.com/mukulpatnaik/res
 - Improved results for research papers.
 - Modification of the frontend.
 
-I use this repository to study OpenAI's API, Microsoft's Azure, GitHub Pages, CI/CD and Vue.js Frontend Framework. The partial original README is below. 
+I use this repository to study OpenAI's API, Microsoft's Azure, GitHub Pages, CI/CD and Vue.js Frontend Framework. The partial original README is below.
 
 This is a flask app provides an interface to enable a conversation with a research paper. You can enter a link to a pdf hosted online or upload your own pdf. The app will then extract the text from the pdf, create embeddings from the text and use them with the openai api to generate a response to a question you ask. It will also return a source for the part of the text it used to generate the response and the page number.
 
@@ -18,8 +18,8 @@ This is a flask app provides an interface to enable a conversation with a resear
 
 ![home2](/images/home2.png)
 
-## Example 
-This web app supports query in multiple languanges and research papers in English/Chinese. Here are the examples of queries:
+## Example
+This web app supports query in multiple languages and research papers in English/Chinese. Here are the examples of queries:
 
 ![demo](/images/demo.png)
 
@@ -53,7 +53,7 @@ export OPENAI_API_KEY=YOUR_API_KEY
 python local.py
 ```
 
-For convenience, the local version stores the embeddings in the `embedding` folder in order to save the cost and time. 
+For convenience, the local version stores the embeddings in the `embedding` folder in order to save the cost and time.
 
 And then open http://127.0.0.1:8080/ in your browser.
 
@@ -64,17 +64,17 @@ The online version does not save any data. Follow the instructions [here](https:
 ```bash
 az webapp up --runtime PYTHON:3.9 --sku B1 --logs
 ```
-The Microsoft Azure's services would identify `app.py` as the entry point of the app. 
+The Microsoft Azure's services would identify `app.py` as the entry point of the app.
 
 ### Railway Deployment
-Click the button below and input your OpenAI API key to deploy the app on Railway. Railway is a free hosting platform for web apps. 
+Click the button below and input your OpenAI API key to deploy the app on Railway. Railway is a free hosting platform for web apps.
 
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/Qm0r-x?referralCode=sNwXpV)
 
 ## Limitations
-Due to the PDF to text conversion and embedding construction technique, the web app is limited to handle detailed query. Also, when a paper has distinguished pattern from the ordinary paper, this application also may not able to handle it. Furthermore, this app can only read *research* papers, which means that other PDF documents (i.e., books, recipts, ppt converted files) are not in the scope of the capability. Comparing to the original version, this version has specifically targeted at this problem and making improvements. We are continuing working on improving the app to give better respond. At this time, you are encouraged to try this app on papers less than 20 pages and give us feedback. The app does not have the limit in page number, though.
+Due to the PDF to text conversion and embedding construction technique, the web app is limited to handle detailed query. Also, when a paper has distinguished pattern from the ordinary paper, this application also may not able to handle it. Furthermore, this app can only read *research* papers, which means that other PDF documents (i.e., books, receipts, ppt converted files) are not in the scope of the capability. Comparing to the original version, this version has specifically targeted at this problem and making improvements. We are continuing working on improving the app to give better respond. At this time, you are encouraged to try this app on papers less than 20 pages and give us feedback. The app does not have the limit in page number, though.
 
-Also, current version of the app is not able to handle the query with simutanous requests, i.e., the web page cannot serve two or more people at the same time. This is out of the scope of my knowledge and I am looking for help.
+Also, current version of the app is not able to handle the query with simultaneous requests, i.e., the web page cannot serve two or more people at the same time. This is out of the scope of my knowledge and I am looking for help.
 
 [![Star History Chart](https://api.star-history.com/svg?repos=MrPeterJin/researchgpt&type=Date)](https://star-history.com/#MrPeterJin/researchgpt&Date)
 
