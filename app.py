@@ -341,7 +341,7 @@ class Chatbot():
             temperature=0.7,
             max_tokens=1500)
         answer = r.choices[0]["message"]["content"]
-        print('Done sending request to openai_chat_model')
+        print('Done sending request to', openai_chat_model)
         if isdetail:
             return {'answer': answer.replace("\n", "")}
         if 'sources' in globals().keys():
