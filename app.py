@@ -276,7 +276,7 @@ class Chatbot():
         {"role": "system", "content": system_role},
         {"role": "user", "content": user_content},]
 
-        print('Done extracting title')
+        print('Done generating title information')
         return messages
 
     def get_scope(self, user_input):
@@ -336,7 +336,6 @@ class Chatbot():
         print('Sending request to ', openai_chat_model)
         r = openai.ChatCompletion.create(
             model=openai_chat_model,
-            engine=openai_chat_model,
             messages=messages,
             temperature=0.7,
             max_tokens=1500)
@@ -361,7 +360,6 @@ def process_pdf():
     if misc_text != []:
         df_misc = chatbot.paper_df(misc_text)
         df_misc = chatbot.calculate_embeddings(df_misc)
-    chatbot = Chatbot()
     title_request = chatbot.get_title(title_related)
     global title
     title = chatbot.gpt(title_request, False)
@@ -383,7 +381,6 @@ def download_pdf():
     if misc_text != []:
         df_misc = chatbot.paper_df(misc_text)
         df_misc = chatbot.calculate_embeddings(df_misc)
-    chatbot = Chatbot()
     title_request = chatbot.get_title(title_related)
     global title
     title = chatbot.gpt(title_request, False)

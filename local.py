@@ -273,7 +273,7 @@ class Chatbot():
         {"role": "system", "content": system_role},
         {"role": "user", "content": user_content},]
         
-        print('Done extracting title')
+        print('Done generating title information')
         return messages
     
     def get_scope(self, user_input):
