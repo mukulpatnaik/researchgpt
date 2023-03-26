@@ -334,8 +334,16 @@ class Chatbot():
 
     def gpt(self, messages, isdetail):
         print('Sending request to ', openai_chat_model)
+        if openai.api_type == "azure":
+            model_params = {
+                "engine": openai_chat_model,
+            }
+        else:
+            model_params = {
+                "model": openai_chat_model,
+            }
         r = openai.ChatCompletion.create(
-            model=openai_chat_model,
+            **model_params,
             messages=messages,
             temperature=0.7,
             max_tokens=1500)
