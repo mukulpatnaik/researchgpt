@@ -1,14 +1,17 @@
-from flask import Flask, request, render_template
-from io import BytesIO
-import pdfplumber
-import pandas as pd
-from openai.embeddings_utils import get_embedding, cosine_similarity
-import openai
-import os
-import requests
 import math
+import os
 from collections import Counter
+from io import BytesIO
+
+import openai
+import pandas as pd
+import pdfplumber
+import requests
+from flask import Flask, render_template, request
 from flask_cors import CORS
+from pathlib import Path
+from llama_index import download_loader, GPTSimpleVectorIndex
+from openai.embeddings_utils import cosine_similarity, get_embedding
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
@@ -16,13 +19,12 @@ app = Flask(__name__, template_folder="./frontend/dist", static_folder="./fronte
 CORS(app)
 
 class Chatbot():
-    
+
     def parse_paper(self, pdf):
         print("Parsing paper")
         global number_of_pages
         number_of_pages = len(pdf.pages)
         print(f"Total number of pages: {number_of_pages}")
-        title_related = []
         paper_text = []
         misc_text = []
         ismisc = False
@@ -32,7 +34,7 @@ class Chatbot():
                 isfirstpage = True
             else:
                 isfirstpage = False
-            
+
             page_text = []
             misc_page_text = []
             sentences = []
@@ -48,7 +50,7 @@ class Chatbot():
                         'x': x,
                         'y': top
                         })
-                        
+
                 else: # not first page, rule out headers
                     if (top > 70 and bottom < 720) and (len(text.strip()) > 1) and not ismisc: # main text region
                             sentences.append({
@@ -64,35 +66,35 @@ class Chatbot():
                             'x': x,
                             'y': top
                             })
-                        
+
             extracted_words = page.extract_words(x_tolerance=1, y_tolerance=3, keep_blank_chars=False, use_text_flow=True, horizontal_ltr=True, vertical_ttb=True, extra_attrs=["fontname", "size"], split_at_punctuation=False)
-            
+
             # Treat the first page, main text, and references differently, specifically targeted at headers
             # Define a list of keywords to ignore
             keywords_for_misc = ['References', 'REFERENCES', 'Bibliography', 'BIBLIOGRAPHY', 'Acknowledgements', 'ACKNOWLEDGEMENTS', 'Acknowledgments', 'ACKNOWLEDGMENTS', '参考文献', '致谢']
 
             keywords_for_exception = ['R', 'B', 'A']
             extracted_words = iter(extracted_words)
-            
+
             # Loop through the extracted words
             for extracted_word in extracted_words:
                 # Strip the text and remove any special characters
                 text = extracted_word['text'].strip().replace('\x03', '')
-                
+
                 if len(text) == 1 and any(keyword in text for keyword in keywords_for_exception):
                     try:
                         tmp_text = text + next(extracted_words)['text']
-                    except StopIteration: 
+                    except StopIteration:
                         pass
-                    
+
                 # Check if the text contains any of the keywords to ignore
                 if 'tmp_text' in locals() and any(keyword in tmp_text for keyword in keywords_for_misc):
                     ismisc = True
-                    
+
                 # Call the visitor_body function with the relevant arguments
                 visitor_body(text, isfirstpage, extracted_word['x0'], extracted_word['top'], extracted_word['bottom'], extracted_word['size'], ismisc=ismisc)
-                        
-            if sentences != []:          
+
+            if sentences != []:
                     if len(sentences) == 1:
                         page_text.append(sentences)
                     for j in range(len(sentences)-1):
@@ -100,7 +102,7 @@ class Chatbot():
                             sentences[j+1]['text'] = f"{sentences[j]['text']}" + sentences[j+1]['text']
                         else:
                             page_text.append(sentences[j])
-            
+
             if ismisc == True:
                     if len(misc_sentences) == 1:
                         misc_page_text.append(misc_sentences)
@@ -110,7 +112,7 @@ class Chatbot():
                                 misc_sentences[j+1]['text'] = f"{misc_sentences[j]['text']}" + misc_sentences[j+1]['text']
                             else:
                                 misc_page_text.append(misc_sentences[j])
-            
+
             blob_font_sizes = []
             blob_font_size = None
             blob_text = ''
@@ -122,7 +124,7 @@ class Chatbot():
                 misc_processed_text = []
             tolerance = 1
             title_tolerance = 3.6
-            
+
             # Preprocessing for title font size
             if isfirstpage:
                 title_clean = []
@@ -139,9 +141,9 @@ class Chatbot():
                 for r in page_text:
                     if title_font_size - title_tolerance <= r['fontsize'] <= title_font_size:
                         title_clean.append(r['text'])
-                
+
                 title_sentence = ' '.join(title_clean)
-            
+
             # Preprocessing for main text font size
             if page_text != []:
                 if len(page_text) == 1:
@@ -150,7 +152,7 @@ class Chatbot():
                     for t in page_text:
                         blob_font_sizes.append(t['fontsize'])
                 blob_font_size = Counter(blob_font_sizes).most_common(1)[0][0]
-            
+
             if ismisc == True:
             # Preprocessing for misc text font size
                 if len(misc_page_text) == 1:
@@ -159,7 +161,7 @@ class Chatbot():
                     for s in misc_page_text:
                         misc_blob_font_sizes.append(s['fontsize'])
                 misc_blob_font_size = Counter(misc_blob_font_sizes).most_common(1)[0][0]
-            
+
             if page_text != []:
                 if len(page_text) == 1:
                     if blob_font_size - tolerance <= page_text[0]['fontsize'] <= blob_font_size + tolerance:
@@ -183,7 +185,7 @@ class Chatbot():
                                     'page': i+1
                                 })
                 paper_text += processed_text
-            
+
             if ismisc == True:
                 if len(misc_page_text) == 1:
                     if misc_blob_font_size - tolerance <= misc_page_text[0]['fontsize'] <= misc_blob_font_size + tolerance:
@@ -208,7 +210,7 @@ class Chatbot():
                                 })
                 misc_text += misc_processed_text
         print("Done parsing paper")
-        
+
         # title judgement
         if len(title_clean) != 1:
             if len(title_clean) <= 3:
@@ -252,47 +254,47 @@ class Chatbot():
             engine="text-embedding-ada-002"
         )
         df["similarity"] = df.embeddings.apply(lambda x: cosine_similarity(x, query_embedding))
-        
+
         results = df.sort_values("similarity", ascending=False, ignore_index=True)
         # make a dictionary of the the first three results with the page number as the key and the text as the value. The page number is a column in the dataframe.
         results = results.head(n).sort_values(by='page')
-        global sources 
+        global sources
         sources = []
         for i in range(n):
             # append the page number and the text as a dict to the sources list
             sources.append({'Page '+str(results.iloc[i]['page']): results.iloc[i]['text'][:150]+'...'})
         print(sources)
         return results.head(n)
-    
+
     def get_title(self, title_related):
         system_role = f"""I have a list contains a title of a paper. I want to extract the title of the paper."""
-        
+
         user_content = f"""Given the string of a title and its related information: "{str(title_related)}". Return the title of the paper. Return the title only. Do not return any additional text."""
-        
+
         messages = [
         {"role": "system", "content": system_role},
         {"role": "user", "content": user_content},]
-        
+
         print('Done generating title information')
         return messages
-    
+
     def get_scope(self, user_input):
         system_role = f"""You are going to determine if a sentence has a request of requesting detailed information of a research paper. Please note that 'main idea', 'summary', 'abstraction', 'overview' are not detailed information. Also, sentences not containing 'detail' or 'reviewer' are not detailed information and you should return a False value. Return a boolean value only."""
-        
+
         user_content = f"""The sentence is: "{str(user_input)}"."""
-        
+
         messages = [
         {"role": "system", "content": system_role},
         {"role": "user", "content": user_content},]
-        
+
         return messages
-    
+
     def create_messages(self, df, user_input, title, isdetail, *df_misc):
         if df_misc == None:
             result_df = df
         else:
             result_df = df.append(df_misc)
-        
+
         if number_of_pages >= 6 and isdetail == True:
             result = self.search_embeddings(result_df, user_input, n=int(math.log2(number_of_pages)) + 2)
         elif number_of_pages >= 6:
@@ -302,30 +304,36 @@ class Chatbot():
                 result = self.search_embeddings(result_df, user_input, n=len(df))
             else:
                 result = self.search_embeddings(result_df, user_input, n=3)
-            
+
         total_max_string = 2000
         if isdetail == True:
             max_string = total_max_string // (int(math.log2(number_of_pages)) + 2)
         else:
             max_string = total_max_string // int(math.log2(number_of_pages))
-        
+
         embeddings = []
-        
+
         for i in range(int(math.log2(number_of_pages))):
             if len(result.iloc[i]['text']) > max_string:
                 embeddings.append(str(result.iloc[i]['text'][:max_string]))
             else:
                 embeddings.append(str(result.iloc[i]['text']))
-            
-        system_role = f"""As an academician, you are tasked with reading and summarizing a scientific paper. You are given a series of text embeddings and the title of the paper, and your goal is to answer any questions related to the paper using the given embeddings and the title. The embeddings are as follows: {str(embeddings)}. The title of the paper is: {title}. To ensure that your answers are accurate and relevant, you must answer in the language of the question. If you cannot answer your question, you will apologize and directly say you do not have the information."""
         
+        def get_gpt_augmentation(query):
+          response = index.query(query)
+          return response
+        
+        gpt_augmentation = get_gpt_augmentation(str(user_input)).response.strip()[:100]
+
+        system_role = f"""As an academician, you are tasked with reading and summarizing a scientific paper. You are given text embeddings, the title of the paper, and a prompt sentence. Your goal is to answer any questions related to the paper using the given embeddings and the title. The embeddings are as follows: {str(embeddings)}. The title of the paper is: {title}. The prompt sentence is: {str(gpt_augmentation)}. To ensure that your answers are accurate and relevant, you must answer in the language of the question. If you cannot answer your question, you will apologize and directly say you do not have the information."""
+
         user_content = f"""The question is: "{str(user_input)}"."""
-        
+
         messages = [
         {"role": "system", "content": system_role},
         {"role": "user", "content": user_content},
         ]
-        
+
         print('Done creating messages')
         return messages
 
@@ -344,31 +352,28 @@ class Chatbot():
 def process_pdf():
     print("Processing pdf")
     file = request.data
+    CJKPDFReader = download_loader("CJKPDFReader")
+    loader = CJKPDFReader()
+    with open('upload.pdf', 'wb') as f:
+          f.write(request.data)
+    global document, index
+    document = loader.load_data(file=Path('./upload.pdf'))
+    index = GPTSimpleVectorIndex.from_documents(document)
     pdf = pdfplumber.open(BytesIO(file))
-    meta = pdf.metadata
     chatbot = Chatbot()
     paper_text, misc_text, title_related = chatbot.parse_paper(pdf)
-    global identifier
-    identifier = meta['CreationDate']
-    paper_text, misc_text, title_related = chatbot.parse_paper(pdf)
     global df_main, df_misc
-    if os.path.exists(f'./embedding/{identifier}_main.pkl'):
-        print("Loading from pickle")
-        df_main = pd.read_pickle(f'./embedding/{identifier}_main.pkl')
-    else:
-        df_main = chatbot.paper_df(paper_text)
-        df_main = chatbot.calculate_embeddings(df_main)
-        df_main.to_pickle(f'./embedding/{identifier}_main.pkl')
-        
-    if os.path.exists(f'./{identifier}_misc.pkl'):
-        df_misc = pd.read_pickle(f'./embedding/{identifier}_misc.pkl')
-    else:
-        if misc_text != []:
-            df_misc = chatbot.paper_df(misc_text)
-            df_misc = chatbot.calculate_embeddings(df_misc)
-            df_misc.to_pickle(f'./embedding/{identifier}_misc.pkl')
+    df_main = chatbot.paper_df(paper_text)
+    df_main = chatbot.calculate_embeddings(df_main)
+    if misc_text != []:
+        df_misc = chatbot.paper_df(misc_text)
+        df_misc = chatbot.calculate_embeddings(df_misc)
     title_request = chatbot.get_title(title_related)
     global title
+    pdf = pdfplumber.open(BytesIO(file))
+    chatbot = Chatbot()
+    paper_text, misc_text, title_related = chatbot.parse_paper(pdf)
+    title_request = chatbot.get_title(title_related)
     title = chatbot.gpt(title_request, False)
     title = title['answer']
     print("Done processing pdf")
@@ -377,32 +382,24 @@ def process_pdf():
 @app.route("/api/download_pdf", methods=['POST'])
 def download_pdf():
     chatbot = Chatbot()
+    CJKPDFReader = download_loader("CJKPDFReader")
+    loader = CJKPDFReader()
     url = request.json['url']
     r = requests.get(str(url))
     print(r.headers)
+    with open('upload.pdf', 'wb') as f:
+          f.write(r.content)
+    global document, index
+    document = loader.load_data(file=Path('./upload.pdf'))
+    index = GPTSimpleVectorIndex.from_documents(document)
     pdf = pdfplumber.open(BytesIO(r.content))
-    meta = pdf.metadata
-    paper_text, misc_text, title_related = chatbot.parse_paper(pdf)
-    global identifier
-    identifier = meta['CreationDate']
     paper_text, misc_text, title_related = chatbot.parse_paper(pdf)
     global df_main, df_misc
-    if os.path.exists(f'./embedding/{identifier}_main.pkl'):
-        print("Loading from pickle")
-        df_main = pd.read_pickle(f'./embedding/{identifier}_main.pkl')
-    else:
-        df_main = chatbot.paper_df(paper_text)
-        df_main = chatbot.calculate_embeddings(df_main)
-        df_main.to_pickle(f'./embedding/{identifier}_main.pkl')
-        
-    if os.path.exists(f'./{identifier}_misc.pkl'):
-        print("Loading from pickle")
-        df_misc = pd.read_pickle(f'./embedding/{identifier}_misc.pkl')
-    else:
-        if misc_text != []:
-            df_misc = chatbot.paper_df(misc_text)
-            df_misc = chatbot.calculate_embeddings(df_misc)
-            df_misc.to_pickle(f'./embedding/{identifier}_misc.pkl')
+    df_main = chatbot.paper_df(paper_text)
+    df_main = chatbot.calculate_embeddings(df_main)
+    if misc_text != []:
+        df_misc = chatbot.paper_df(misc_text)
+        df_misc = chatbot.calculate_embeddings(df_misc)
     title_request = chatbot.get_title(title_related)
     global title
     title = chatbot.gpt(title_request, False)
@@ -417,15 +414,15 @@ def reply():
     query = str(query)
     scope_request = chatbot.get_scope(query)
     scope = chatbot.gpt(scope_request, True)
-    
+
     if 'true' in scope['answer'] or 'True' in scope['answer'] or 'yes' in scope['answer'] or 'Yes' in scope['answer']:
         scope = True
     else:
         scope = False
-    
+
     print('Scope: ', scope)
-    
-        # Define a list of keywords to match
+
+    # Define a list of keywords to match
     keywords_to_match = ['reference', 'references', 'cite', 'citation', 'citations', 'cited', 'citing', 'acknowledgment', 'acknowledgements', 'appendix', 'appendices', '参考文献', '致谢', '附录']
 
     # Check if the query matches any of the keywords and if 'df_misc' is defined

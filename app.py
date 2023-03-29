@@ -9,13 +9,15 @@ import pdfplumber
 import requests
 from flask import Flask, render_template, request
 from flask_cors import CORS
+from pathlib import Path
+from llama_index import download_loader, GPTSimpleVectorIndex
 from openai.embeddings_utils import cosine_similarity, get_embedding
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 if openai.api_type == "azure":
     openai.api_version = os.environ.get("OPENAI_API_VERSION", "2023-03-15-preview")
 openai_chat_model = os.environ.get("OPENAI_CHAT_MODEL", "gpt-3.5-turbo")
-openai_embedding_model = os.environ.get("OPENAI_EMBEDDING_MODEL", "text-embedding-ada-002")
+openai_embedding_model = os.environ.get("OPENAI_EMBEDDING_MODEL", "text-embedding-ada-002") 
 
 app = Flask(__name__, template_folder="./frontend/dist", static_folder="./frontend/dist/assets")
 CORS(app)
@@ -319,8 +321,14 @@ class Chatbot():
                 embeddings.append(str(result.iloc[i]['text'][:max_string]))
             else:
                 embeddings.append(str(result.iloc[i]['text']))
+        
+        def get_gpt_augmentation(query):
+          response = index.query(query)
+          return response
+        
+        gpt_augmentation = get_gpt_augmentation(str(user_input)).response.strip()[:100]
 
-        system_role = f"""As an academician, you are tasked with reading and summarizing a scientific paper. You are given a series of text embeddings and the title of the paper, and your goal is to answer any questions related to the paper using the given embeddings and the title. The embeddings are as follows: {str(embeddings)}. The title of the paper is: {title}. To ensure that your answers are accurate and relevant, you must answer in the language of the question. If you cannot answer your question, you will apologize and directly say you do not have the information."""
+        system_role = f"""As an academician, you are tasked with reading and summarizing a scientific paper. You are given text embeddings, the title of the paper, and a prompt sentence. Your goal is to answer any questions related to the paper using the given embeddings and the title. The embeddings are as follows: {str(embeddings)}. The title of the paper is: {title}. The prompt sentence is: {str(gpt_augmentation)}. To ensure that your answers are accurate and relevant, you must answer in the language of the question. If you cannot answer your question, you will apologize and directly say you do not have the information."""
 
         user_content = f"""The question is: "{str(user_input)}"."""
 
@@ -351,6 +359,13 @@ class Chatbot():
 def process_pdf():
     print("Processing pdf")
     file = request.data
+    CJKPDFReader = download_loader("CJKPDFReader")
+    loader = CJKPDFReader()
+    with open('upload.pdf', 'wb') as f:
+          f.write(request.data)
+    global document, index
+    document = loader.load_data(file=Path('./upload.pdf'))
+    index = GPTSimpleVectorIndex.from_documents(document)
     pdf = pdfplumber.open(BytesIO(file))
     chatbot = Chatbot()
     paper_text, misc_text, title_related = chatbot.parse_paper(pdf)
@@ -362,6 +377,10 @@ def process_pdf():
         df_misc = chatbot.calculate_embeddings(df_misc)
     title_request = chatbot.get_title(title_related)
     global title
+    pdf = pdfplumber.open(BytesIO(file))
+    chatbot = Chatbot()
+    paper_text, misc_text, title_related = chatbot.parse_paper(pdf)
+    title_request = chatbot.get_title(title_related)
     title = chatbot.gpt(title_request, False)
     title = title['answer']
     print("Done processing pdf")
@@ -370,9 +389,16 @@ def process_pdf():
 @app.route("/api/download_pdf", methods=['POST'])
 def download_pdf():
     chatbot = Chatbot()
+    CJKPDFReader = download_loader("CJKPDFReader")
+    loader = CJKPDFReader()
     url = request.json['url']
     r = requests.get(str(url))
     print(r.headers)
+    with open('upload.pdf', 'wb') as f:
+          f.write(r.content)
+    global document, index
+    document = loader.load_data(file=Path('./upload.pdf'))
+    index = GPTSimpleVectorIndex.from_documents(document)
     pdf = pdfplumber.open(BytesIO(r.content))
     paper_text, misc_text, title_related = chatbot.parse_paper(pdf)
     global df_main, df_misc
