@@ -8,6 +8,9 @@ flask-cors
 matplotlib
 scipy
 plotly
-gunicorn==20.1.0
 scikit-learn
 llama_index
+torch
+torchvision
+torchaudio
+gunicorn==20.1.0
