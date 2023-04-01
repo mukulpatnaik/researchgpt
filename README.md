@@ -71,6 +71,21 @@ Click the button below and input your OpenAI API key to deploy the app on Railwa
 
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/Qm0r-x?referralCode=sNwXpV)
 
+### Docker
+
+The app has been containerized to simplify deployment.
+
+To build:
+```bash
+docker build . -t researchgpt
+```
+
+To run:
+```bash
+docker run -p 8080:8080 -e OPENAI_API_KEY=your_api_key researchgpt
+```
+And then open http://127.0.0.1:8080/ in your browser.
+
 ## Limitations
 Due to the PDF to text conversion and embedding construction technique, the web app is limited to handle detailed query. Also, when a paper has distinguished pattern from the ordinary paper, this application also may not able to handle it. Furthermore, this app can only read *research* papers, which means that other PDF documents (i.e., books, receipts, ppt converted files) are not in the scope of the capability. Comparing to the original version, this version has specifically targeted at this problem and making improvements. We are continuing working on improving the app to give better respond. At this time, you are encouraged to try this app on papers less than 20 pages and give us feedback. The app does not have the limit in page number, though.
 
