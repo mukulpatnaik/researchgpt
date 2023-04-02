@@ -7,7 +7,7 @@
 This is a fork of the original [ResearchGPT](https://github.com/mukulpatnaik/researchgpt). The current version modifies several settings from the original:
 - Use `GPT-3.5-turbo` instead of `GPT-3`.
 - Add Chinese language support.
-- Improved results for research papers.
+- Improved results (Powered by [llama-index](https://github.com/jerryjliu/llama_index)) for research papers.
 - Modification of the frontend.
 
 I use this repository to study OpenAI's API, Microsoft's Azure, GitHub Pages, CI/CD and Vue.js Frontend Framework. The partial original README is below.
@@ -87,7 +87,7 @@ docker run -p 8080:8080 -e OPENAI_API_KEY=your_api_key researchgpt
 And then open http://127.0.0.1:8080/ in your browser.
 
 ## Limitations
-Due to the PDF to text conversion and embedding construction technique, the web app is limited to handle detailed query. Also, when a paper has distinguished pattern from the ordinary paper, this application also may not able to handle it. Furthermore, this app can only read *research* papers, which means that other PDF documents (i.e., books, receipts, ppt converted files) are not in the scope of the capability. Comparing to the original version, this version has specifically targeted at this problem and making improvements. We are continuing working on improving the app to give better respond. At this time, you are encouraged to try this app on papers less than 20 pages and give us feedback. The app does not have the limit in page number, though.
+Due to the PDF to text conversion and embedding construction technique, the web app is limited to handle detailed query. Also, when a paper has distinguished pattern from the ordinary paper, this application also may not able to handle it. We are continuing working on improving the app to give better respond. At this time, you are encouraged to try this app on papers less than 20 pages and give us feedback. The app does not have the limit in page number, though.
 
 Also, current version of the app is not able to handle the query with simultaneous requests, i.e., the web page cannot serve two or more people at the same time. This is out of the scope of my knowledge and I am looking for help.
 
