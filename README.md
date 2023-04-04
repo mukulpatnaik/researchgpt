@@ -18,9 +18,14 @@ pip install -r requirements.txt
 
 ## Usage
 
-You need to have an openai api key and set it as the environment variable 'OPENAI_API_KEY'.
 
-```bash
+Update the value of the ```OPENAI_API_KEY``` environment variable in ```app.yaml``` with your OpenAI api key. Instructions for finding your OpenAI api key are available [here](https://help.openai.com/en/articles/4936850-where-do-i-find-my-secret-api-key).
+
+or
+
+To run locally, without editing any values in the ```app.yaml```, modify the environment variable and start the application:
+```
+export OPENAI_API_KEY="Your_API_Key_Here"
 python main-local.py
 ```
 
