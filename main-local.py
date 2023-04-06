@@ -128,12 +128,12 @@ class Chatbot():
         print('Done creating prompt')
         return prompt
 
-    def gpt(self, prompt):
-        print('Sending request to GPT-3')
+    def gpt(self, messages):
+        print('Sending request to GPT-4')
         openai.api_key = os.getenv('OPENAI_API_KEY')
-        r = openai.Completion.create(model="text-davinci-003", prompt=prompt, temperature=0.4, max_tokens=1500)
-        answer = r.choices[0]['text']
-        print('Done sending request to GPT-3')
+        r = openai.ChatCompletion.create(model="gpt-4", messages=messages, temperature=0.7, max_tokens=2500)
+        answer = r.choices[0]["message"]["content"]
+        print('Done sending request to GPT-4')
         response = {'answer': answer, 'sources': sources}
         return response
 
