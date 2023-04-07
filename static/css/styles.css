@@ -66,4 +66,10 @@ input[type="text"] {
     font-size: 18px;
     font-weight: lighter;
   }
-  
+
+#logo {
+    display: block;
+    margin: 0 auto;
+    padding-top: 16px;
+    max-width: 600px;
+}
