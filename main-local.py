@@ -179,7 +179,11 @@ def reply():
     query = request.json['query']
     query = str(query)
     prompt = chatbot.create_prompt(df, query)
-    response = chatbot.gpt(prompt)
+    messages = [
+        { "role": "system", "content": prompt},
+        { "role": "user",   "content": query },
+    ]
+    response = chatbot.gpt(messages)
     print(response)
     return response, 200
 
