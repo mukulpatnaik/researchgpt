@@ -11,6 +11,7 @@ const p = document.querySelector("p");
 const up = document.querySelector("#up");
 const y = document.querySelector("#url");
 const send = document.querySelector("#send");
+const logo = document.querySelector("#logo");
 
 
 send.addEventListener("click", function(event) {
@@ -113,6 +114,7 @@ y.addEventListener("submit", function(event) {
         const pdfUrl = URL.createObjectURL(pdfBlob);
         pdfjsLib.getDocument(pdfUrl).promise.then(pdfDoc => {
             viewer.src = pdfUrl;
+            logo.style.display = "none";
             uploadBtn.style.display = "none";
             form.style.display = "none";
             form.style.marginTop = "0px";
@@ -192,6 +194,7 @@ input.addEventListener("change", async function() {
   pdfjsLib.getDocument(fileArrayBuffer).promise.then(pdfDoc => {
   viewer.src = URL.createObjectURL(file);
   uploadBtn.style.display = "none";
+  logo.style.display = "none";
   form.style.display = "none";
   form.style.marginTop = "0px";
   p.style.display = "none";
