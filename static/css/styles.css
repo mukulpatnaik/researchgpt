@@ -40,13 +40,13 @@ input[type="text"] {
 #container {
     display: none;
     width: 100%;
-    height: 80%;
+    height: 100vh;
     flex-direction: row;
 }
 
 .pdf-viewer {
     width: 100%;
-    height: 80%;
+    height: 100vh;
     display: none;
 }
 
