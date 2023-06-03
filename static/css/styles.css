@@ -55,7 +55,7 @@ input[type="text"] {
 }
 
 #chat p {
-    color: white;
+    color: rgb(246, 243, 243);
     margin: 10px;
     padding: 10px;
     border-radius: 10px;

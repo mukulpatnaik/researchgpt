@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="static/css/styles.css">
   </head>
   <body>
+
     <form id='url' style="margin-top: 320px; margin-bottom: 20px; width: 100%; text-align: center;">
         <input type="text" name="pdf-url" placeholder="Enter URL" style="color: lightgray; padding: 10px; border: none; background-color: black; font: 1.2em Roboto; font-style: italic; width: 100%; text-align: center">
     </form>
@@ -16,6 +17,7 @@
       <label for="file-input" class="upload-btn">Upload PDF</label>
       <input type="file" accept=".pdf" id="file-input"/>
     </form>
+    
     <div id="container">
         <iframe id="pdf-viewer" class="pdf-viewer" style="border-width: 0"></iframe> 
         <div style="width: 40%; height: 100vh; border: none; background-color: black; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
@@ -30,5 +32,6 @@
             </form>
         </div>          
     </div>
+    
   </body>
 </html>
