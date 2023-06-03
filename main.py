@@ -77,7 +77,7 @@ class Chatbot():
                         processed_text.append({"fontsize": blob_font_size, "text": blob_text, "page": i})
                     blob_font_size = t["fontsize"]
                     blob_text = t["text"]
-                paper_text += processed_text
+            paper_text += processed_text
         print("Done parsing paper")
         # print(paper_text)
         return paper_text
