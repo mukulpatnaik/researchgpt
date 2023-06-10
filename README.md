@@ -11,6 +11,7 @@ https://github.com/mukulpatnaik/researchgpt/assets/36257370/e94e2d19-6e7c-4897-9
 ## Installation
 
 ```bash
+sudo apt install python3-pip uvicorn
 git clone https://github.com/mukulpatnaik/researchgpt.git
 cd researchgpt
 pip install -r requirements.txt
@@ -25,6 +26,10 @@ redis-server
 ```
 
 On Windows:
+
+Set WSL ([tutorial](https://gist.github.com/djibe/c60f6a055779ad89b5f84f81a2d337f7)).
+
+All commands must be set in WSL bash (redis, git, uvicorn). The webapp can then be used from Windows favorite web browser.
 
 ```bash
 sudo service redis-server start
