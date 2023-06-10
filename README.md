@@ -37,7 +37,16 @@ sudo service redis-server start
 
 ## Usage
 
-You need to have an openai api key and set it as the environment variable 'OPENAI_API_KEY'.
+You need to have an OpenAI API key and set it as the environment variable 'OPENAI_API_KEY'.
+
+- Create an OpenAI API key: <https://platform.openai.com/account/api-keys>
+- Copy the key
+- Declare permanent environment variable (Ubuntu WSL): `nano ~/.bashrc`
+- Scroll down and add to the end of file: `export OPENAI_API_KEY="YOUR_API_KEY"
+- Use following keys to exit `nano`: CTRL + O > ENTER > CTRL + X
+- Reload environment variables: `source ~/.bashrc`
+
+Now launch the webapp:
 
 ```bash
 uvicorn main:app --reload
