@@ -6,7 +6,7 @@ Try the demo at: https://www.dara.chat
 
 ## Example 
 
-https://github.com/mukulpatnaik/researchgpt/assets/36257370/e94e2d19-6e7c-4897-9c0a-ef250101e8b4
+https://user-images.githubusercontent.com/36257370/230793133-ecb579d3-47d9-4200-916a-9c5978a40b09.mp4
 
 ## Installation
 
