@@ -5,8 +5,9 @@ This is a simple fastapi app that provides a clean interface to enable a convers
 Try the demo at: https://www.dara.chat
 
 ## Example 
+(this video shows some features available on the [live demo](https://www.dara.chat) only )
 
-https://github.com/mukulpatnaik/researchgpt/assets/36257370/e94e2d19-6e7c-4897-9c0a-ef250101e8b4
+https://user-images.githubusercontent.com/36257370/230793133-ecb579d3-47d9-4200-916a-9c5978a40b09.mp4
 
 ## Installation
 
@@ -33,6 +34,10 @@ sudo service redis-server start
 ## Usage
 
 You need to have an openai api key and set it as the environment variable 'OPENAI_API_KEY'.
+
+You can get the OpenAI API key here - https://platform.openai.com/account/api-keys
+
+To set your environment variable open your .bashrc or .zshrc and add the line `export OPENAI_API_KEY="your-key`, make sure to put your actual key instead of "your-key".
 
 ```bash
 uvicorn main:app --reload
