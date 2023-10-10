@@ -136,7 +136,7 @@ class Chatbot():
         sources = result['sources']
         system_role = """You are a AI assistant whose expertise is reading and summarizing scientific papers. You are given a query, 
         a series of text embeddings and the title from a paper in order of their cosine similarity to the query. 
-        You must take the given embeddings and return a very detailed summary of the paper in the languange of the query:
+        You must take the given embeddings and return a very detailed summary of the paper in the language of the query:
         """
 
         user_input = user_input + """
