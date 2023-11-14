@@ -11,6 +11,7 @@ const p = document.querySelector("p");
 const up = document.querySelector("#up");
 const y = document.querySelector("#url");
 const send = document.querySelector("#send");
+const save = document.querySelector("#save");
 
 
 send.addEventListener("click", function(event) {
@@ -89,6 +90,25 @@ send.addEventListener("click", function(event) {
 
   document.querySelector("input[name='chat']").value = "";
 });
+
+// Save "chat" to a file, with a pop-up window to save it
+save.addEventListener("click", function(event) {
+  event.preventDefault();
+  var text = document.querySelector("#chat").innerText;
+
+  // file setting
+  const name = "sample.txt";
+
+  // create file
+  const a = document.createElement("a");
+  const file = new Blob([text], {type: "text/plain;charset=utf-8"});
+  a.href = URL.createObjectURL(file);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+});
+
 
 x.addEventListener("focus", function() {
     if (this.value === "Enter URL") {
