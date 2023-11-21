@@ -1,3 +1,5 @@
+## **This repository is no longer actively maintained. A more advanced version of this project is available at [chat.portal.so](https://chat.portal.so) for free and will be open sourced soon.**
+
 # ResearchGPT
 
 This is a simple fastapi app that provides a clean interface to enable a conversation with any pdf. You can enter a link to a pdf hosted online or upload your own pdf. The app will then extract the text from the pdf, create embeddings from the text and use them with the openai api to generate a response to a question you ask. It will also return a source for the part of the text it used to generate the response and the page number. 
